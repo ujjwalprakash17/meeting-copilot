@@ -1,0 +1,94 @@
+{
+  "label": "after",
+  "generatedAt": "2026-10-23T05:30:13.414Z",
+  "providers": {
+    "stt": "deepgram nova-3 (real)",
+    "llm": "groq openai/gpt-oss-120b (real)",
+    "diarize": true
+  },
+  "questions": [
+    {
+      "text": "What is the difference between a process and a thread?",
+      "speculative": false,
+      "firstTextMs": 584,
+      "dispatchMs": 21,
+      "providerTtftMs": 562,
+      "confirmedMs": null,
+      "error": null
+    },
+    {
+      "text": "And how would you design a rate limiter for a public API?",
+      "speculative": false,
+      "firstTextMs": 529,
+      "dispatchMs": 8,
+      "providerTtftMs": 520,
+      "confirmedMs": null,
+      "error": null
+    },
+    {
+      "text": "Should I go into more detail about the trade offs?",
+      "speculative": true,
+      "firstTextMs": 573,
+      "dispatchMs": 1,
+      "providerTtftMs": 572,
+      "confirmedMs": 395,
+      "error": null
+    },
+    {
+      "text": "Tell me about a project where you handled a large transaction volume.",
+      "speculative": true,
+      "firstTextMs": 579,
+      "dispatchMs": 4,
+      "providerTtftMs": 574,
+      "confirmedMs": 573,
+      "error": null
+    }
+  ],
+  "summary": {
+    "firstTextMs": {
+      "n": 4,
+      "p50": 573,
+      "p95": 584,
+      "min": 529,
+      "max": 584
+    },
+    "dispatchMs": {
+      "n": 4,
+      "p50": 4,
+      "p95": 21,
+      "min": 1,
+      "max": 21
+    },
+    "providerTtftMs": {
+      "n": 4,
+      "p50": 562,
+      "p95": 574,
+      "min": 520,
+      "max": 574
+    },
+    "retractedTentative": 0,
+    "llmRequests": 4
+  },
+  "transcript": [
+    "[Speaker 1] Hi, thanks for joining us today.",
+    "[Speaker 1] Can you hear me clearly?",
+    "[Speaker 1] Yes, I can hear you fine.",
+    "[Speaker 1] Great.",
+    "[Speaker 1] Let's start with something technical.",
+    "[Speaker 1] What is the difference between a process and a thread?",
+    "[Speaker 2] A process has its own memory space,",
+    "[Speaker 2] while threads share memory inside a single process.",
+    "[Speaker 1] Okay.",
+    "[Speaker 1] And how would you design a rate limiter for a public API?",
+    "[Speaker 2] I would use a token bucket for each client and keep",
+    "[Speaker 2] the counters in Redis.",
+    "[Speaker 1] Sure.",
+    "[Speaker 2] Should I go into more detail about the trade offs?",
+    "[Speaker 1] No, that's fine.",
+    "[Speaker 1] Tell me about a project where you handled a large transaction volume.",
+    "[Speaker 2] At my last company I built a payment",
+    "[Speaker 2] service that handled millions of transactions every day.",
+    "[Speaker 1] Thank you. That's all from my side."
+  ],
+  "errors": []
+}

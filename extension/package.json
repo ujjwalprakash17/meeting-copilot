@@ -1,0 +1,26 @@
+{
+  "name": "@meeting-copilot/extension",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vite build --watch --mode development",
+    "build": "tsc -p tsconfig.json && vite build",
+    "typecheck": "tsc -p tsconfig.json",
+    "validate": "node scripts/validate-manifest.mjs",
+    "icons": "node scripts/generate-icons.mjs",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "@meeting-copilot/shared": "*",
+    "react": "^19.3.1",
+    "react-dom": "^19.3.1"
+  },
+  "devDependencies": {
+    "@types/chrome": "^0.3.6",
+    "@types/react": "^19.3.0",
+    "@types/react-dom": "^19.3.0",
+    "@vitejs/plugin-react": "^6.1.2",
+    "vite": "^8.3.5"
+  }
+}

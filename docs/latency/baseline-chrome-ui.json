@@ -1,0 +1,86 @@
+{
+  "label": "baseline",
+  "generatedAt": "2026-10-22T17:22:05.620Z",
+  "environment": "Chrome for Testing 156 (headless), Windows 11, extension loaded unpacked; simulation mode + mock LLM (ttft 0); 2 runs of the default 5-question script",
+  "note": "Times are relative to question.textAvailableAt (server clock, same machine). firstRenderedMs = MutationObserver saw answer text in the assistant window DOM.",
+  "firstDeltaReceivedMs": {
+    "n": 10,
+    "p50": 322,
+    "p95": 355,
+    "max": 355
+  },
+  "firstRenderedMs": {
+    "n": 10,
+    "p50": 325,
+    "p95": 371,
+    "max": 371
+  },
+  "confirmedMs": {
+    "n": 0,
+    "p50": null,
+    "p95": null,
+    "max": null
+  },
+  "samples": [
+    {
+      "question": "Can you explain the difference between a process and a thread?",
+      "firstDeltaReceivedMs": 355,
+      "firstRenderedMs": 371,
+      "confirmedMs": null
+    },
+    {
+      "question": "Walk me through how you would design a rate limiter for a public API.",
+      "firstDeltaReceivedMs": 325,
+      "firstRenderedMs": 329,
+      "confirmedMs": null
+    },
+    {
+      "question": "And how would it behave across multiple servers?",
+      "firstDeltaReceivedMs": 325,
+      "firstRenderedMs": 328,
+      "confirmedMs": null
+    },
+    {
+      "question": "Tell me about a project where you handled a large transaction volume.",
+      "firstDeltaReceivedMs": 321,
+      "firstRenderedMs": 322,
+      "confirmedMs": null
+    },
+    {
+      "question": "What did you study at university?",
+      "firstDeltaReceivedMs": 322,
+      "firstRenderedMs": 325,
+      "confirmedMs": null
+    },
+    {
+      "question": "Can you explain the difference between a process and a thread?",
+      "firstDeltaReceivedMs": 322,
+      "firstRenderedMs": 324,
+      "confirmedMs": null
+    },
+    {
+      "question": "Walk me through how you would design a rate limiter for a public API.",
+      "firstDeltaReceivedMs": 325,
+      "firstRenderedMs": 328,
+      "confirmedMs": null
+    },
+    {
+      "question": "And how would it behave across multiple servers?",
+      "firstDeltaReceivedMs": 317,
+      "firstRenderedMs": 324,
+      "confirmedMs": null
+    },
+    {
+      "question": "Tell me about a project where you handled a large transaction volume.",
+      "firstDeltaReceivedMs": 320,
+      "firstRenderedMs": 322,
+      "confirmedMs": null
+    },
+    {
+      "question": "What did you study at university?",
+      "firstDeltaReceivedMs": 329,
+      "firstRenderedMs": 333,
+      "confirmedMs": null
+    }
+  ]
+}

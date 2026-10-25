@@ -1,0 +1,215 @@
+{
+  "label": "phaseF-after",
+  "generatedAt": "2026-10-23T15:35:58.721Z",
+  "node": "v24.19.0",
+  "note": "Mock LLM + simulated STT timing model. Excludes real Deepgram processing and real Groq latency.",
+  "params": {
+    "reps": 10,
+    "mockTtftMs": 0,
+    "mockTokenDelayMs": 5,
+    "modelledEndpointingMs": 300,
+    "modelledUtteranceEndMs": 1000,
+    "wordMs": 220
+  },
+  "scenarios": {
+    "endpointed": {
+      "describe": "interim with full text, final with speech_final 300 ms after the last word",
+      "expectedQuestions": 10,
+      "acceptedQuestions": 10,
+      "retractedSpeculations": 0,
+      "llmRequests": 10,
+      "dispatchMs": {
+        "n": 10,
+        "p50": 1,
+        "p95": 2,
+        "max": 2
+      },
+      "firstTextMs": {
+        "n": 10,
+        "p50": 2,
+        "p95": 3,
+        "max": 3
+      },
+      "confirmedMs": {
+        "n": 10,
+        "p50": 312,
+        "p95": 314,
+        "max": 314
+      },
+      "completeMs": {
+        "n": 10,
+        "p50": 558,
+        "p95": 577,
+        "max": 577
+      },
+      "mockTtftMs": {
+        "n": 10,
+        "p50": 0,
+        "p95": 1,
+        "max": 1
+      }
+    },
+    "no-speech-final": {
+      "describe": "final without speech_final at +300 ms; only UtteranceEnd at +1000 ms marks the end",
+      "expectedQuestions": 10,
+      "acceptedQuestions": 10,
+      "retractedSpeculations": 0,
+      "llmRequests": 10,
+      "dispatchMs": {
+        "n": 10,
+        "p50": 1,
+        "p95": 5,
+        "max": 5
+      },
+      "firstTextMs": {
+        "n": 10,
+        "p50": 2,
+        "p95": 6,
+        "max": 6
+      },
+      "confirmedMs": {
+        "n": 10,
+        "p50": 717,
+        "p95": 727,
+        "max": 727
+      },
+      "completeMs": {
+        "n": 10,
+        "p50": 475,
+        "p95": 532,
+        "max": 532
+      },
+      "mockTtftMs": {
+        "n": 10,
+        "p50": 0,
+        "p95": 1,
+        "max": 1
+      }
+    },
+    "final-only": {
+      "describe": "no interim result with the complete text; the final (speech_final) is the first complete text",
+      "expectedQuestions": 10,
+      "acceptedQuestions": 10,
+      "retractedSpeculations": 0,
+      "llmRequests": 10,
+      "dispatchMs": {
+        "n": 10,
+        "p50": 1,
+        "p95": 2,
+        "max": 2
+      },
+      "firstTextMs": {
+        "n": 10,
+        "p50": 2,
+        "p95": 3,
+        "max": 3
+      },
+      "confirmedMs": {
+        "n": 10,
+        "p50": 2,
+        "p95": 3,
+        "max": 3
+      },
+      "completeMs": {
+        "n": 10,
+        "p50": 529,
+        "p95": 567,
+        "max": 567
+      },
+      "mockTtftMs": {
+        "n": 10,
+        "p50": 0,
+        "p95": 1,
+        "max": 1
+      }
+    },
+    "split": {
+      "describe": "question split across two finals (first without speech_final)",
+      "expectedQuestions": 10,
+      "acceptedQuestions": 10,
+      "retractedSpeculations": 0,
+      "llmRequests": 10,
+      "dispatchMs": {
+        "n": 10,
+        "p50": 1,
+        "p95": 2,
+        "max": 2
+      },
+      "firstTextMs": {
+        "n": 10,
+        "p50": 2,
+        "p95": 4,
+        "max": 4
+      },
+      "confirmedMs": {
+        "n": 10,
+        "p50": 311,
+        "p95": 316,
+        "max": 316
+      },
+      "completeMs": {
+        "n": 10,
+        "p50": 565,
+        "p95": 595,
+        "max": 595
+      },
+      "mockTtftMs": {
+        "n": 10,
+        "p50": 0,
+        "p95": 1,
+        "max": 1
+      }
+    },
+    "revised": {
+      "describe": "interim shows a complete question, but the final adds words (hypothesis revised)",
+      "expectedQuestions": 10,
+      "acceptedQuestions": 10,
+      "retractedSpeculations": 10,
+      "llmRequests": 20,
+      "dispatchMs": {
+        "n": 10,
+        "p50": 2,
+        "p95": 6,
+        "max": 6
+      },
+      "firstTextMs": {
+        "n": 10,
+        "p50": 3,
+        "p95": 7,
+        "max": 7
+      },
+      "confirmedMs": {
+        "n": 10,
+        "p50": 3,
+        "p95": 7,
+        "max": 7
+      },
+      "completeMs": {
+        "n": 10,
+        "p50": 557,
+        "p95": 602,
+        "max": 602
+      },
+      "mockTtftMs": {
+        "n": 10,
+        "p50": 0,
+        "p95": 1,
+        "max": 1
+      }
+    }
+  },
+  "overall": {
+    "firstTextMs": {
+      "n": 50,
+      "p50": 2,
+      "p95": 4,
+      "max": 7
+    },
+    "dispatchMs": {
+      "n": 50,
+      "p50": 1,
+      "p95": 3,
+      "max": 6
+    }
+  }
+}

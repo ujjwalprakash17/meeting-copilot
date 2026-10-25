@@ -1,0 +1,65 @@
+{
+  "label": "baseline-nodiarize-r2",
+  "generatedAt": "2026-10-22T18:58:57.332Z",
+  "provider": "deepgram (real API)",
+  "model": "nova-3",
+  "diarize": false,
+  "url": "wss://api.deepgram.com/v1/listen?model=nova-3&language=en&encoding=linear16&sample_rate=16000&channels=1&interim_results=true&punctuate=true&smart_format=true&endpointing=300&utterance_end_ms=1000&vad_events=true",
+  "audioSeconds": 62,
+  "wer": {
+    "wer": 0,
+    "errors": 0,
+    "words": 125
+  },
+  "segments": 19,
+  "segmentsMixingTwoReferenceSpeakers": 0,
+  "parserAttribution": {
+    "wordsScored": 124,
+    "wordsLabelled": 0,
+    "accuracy": null,
+    "distinctLabels": 0
+  },
+  "deepgramWordAttribution": {
+    "wordsScored": 124,
+    "wordsLabelled": 0,
+    "accuracy": null,
+    "distinctLabels": 0
+  },
+  "lagAfterLineEndMs": {
+    "firstTranscript": {
+      "n": 12,
+      "p50": 0,
+      "p95": 44,
+      "min": 0,
+      "max": 44
+    },
+    "final": {
+      "n": 12,
+      "p50": 4,
+      "p95": 85,
+      "min": 0,
+      "max": 85
+    }
+  },
+  "transcript": [
+    "Hi, thanks for joining us today.",
+    "Can you hear me clearly?",
+    "Yes, I can hear you fine.",
+    "Great.",
+    "Let's start with something technical.",
+    "What is the difference between a process and a thread?",
+    "A process has its own memory space,",
+    "while threads share memory inside a single process.",
+    "Okay.",
+    "And how would you design a rate limiter for a public API?",
+    "I would use a token bucket for each client and keep",
+    "the counters in Redis.",
+    "Sure.",
+    "Should I go into more detail about the trade offs?",
+    "No, that's fine.",
+    "Tell me about a project where you handled a large transaction volume.",
+    "At my last company I built a payment",
+    "service that handled millions of transactions every day.",
+    "Thank you. That's all from my side."
+  ]
+}

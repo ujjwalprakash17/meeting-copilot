@@ -1,0 +1,3362 @@
+[
+ {
+  "text": "What made you decide to leave your last company?",
+  "label": "yes",
+  "category": "direct",
+  "source": "A"
+ },
+ {
+  "text": "what's the difference between a process and a thread",
+  "label": "yes",
+  "category": "direct",
+  "source": "A"
+ },
+ {
+  "text": "Which database would you pick for a write-heavy workload, and why?",
+  "label": "yes",
+  "category": "direct",
+  "source": "A"
+ },
+ {
+  "text": "Do you have any hands-on experience with GraphQL",
+  "label": "yes",
+  "category": "direct",
+  "source": "A"
+ },
+ {
+  "text": "what's your current ctc",
+  "label": "yes",
+  "category": "direct",
+  "source": "A"
+ },
+ {
+  "text": "How soon could you start if we extended an offer?",
+  "label": "yes",
+  "category": "direct",
+  "source": "A"
+ },
+ {
+  "text": "Why do you want to work at a fintech rather than a big tech company?",
+  "label": "yes",
+  "category": "direct",
+  "source": "A"
+ },
+ {
+  "text": "How would you handle a teammate who keeps missing deadlines?",
+  "label": "yes",
+  "category": "direct",
+  "source": "A"
+ },
+ {
+  "text": "What's the time complexity of what you just wrote?",
+  "label": "yes",
+  "category": "direct",
+  "source": "A"
+ },
+ {
+  "text": "Are you open to relocating to Hyderabad?",
+  "label": "yes",
+  "category": "direct",
+  "source": "A"
+ },
+ {
+  "text": "What's the status on the migration ticket from your side?",
+  "label": "yes",
+  "category": "direct",
+  "source": "A"
+ },
+ {
+  "text": "is that something you've actually run in production",
+  "label": "yes",
+  "category": "direct",
+  "source": "A"
+ },
+ {
+  "text": "How does a hash map deal with collisions.",
+  "label": "yes",
+  "category": "direct",
+  "source": "A"
+ },
+ {
+  "text": "What do you think we should prioritize for the next sprint?",
+  "label": "yes",
+  "category": "direct",
+  "source": "A"
+ },
+ {
+  "text": "Who was the toughest stakeholder you've worked with, and what made them difficult?",
+  "label": "yes",
+  "category": "direct",
+  "source": "A"
+ },
+ {
+  "text": "Describe a time you disagreed with your manager and how it got resolved.",
+  "label": "yes",
+  "category": "imperative",
+  "source": "A"
+ },
+ {
+  "text": "Explain how garbage collection works in the JVM.",
+  "label": "yes",
+  "category": "imperative",
+  "source": "A"
+ },
+ {
+  "text": "List three things you would change about our onboarding flow.",
+  "label": "yes",
+  "category": "imperative",
+  "source": "A"
+ },
+ {
+  "text": "Name a couple of design patterns you use regularly.",
+  "label": "yes",
+  "category": "imperative",
+  "source": "A"
+ },
+ {
+  "text": "Show me how you'd reverse a linked list in place.",
+  "label": "yes",
+  "category": "imperative",
+  "source": "A"
+ },
+ {
+  "text": "Compare REST and gRPC for internal service-to-service calls.",
+  "label": "yes",
+  "category": "imperative",
+  "source": "A"
+ },
+ {
+  "text": "Calculate roughly how much storage a billion rows at 200 bytes each would need.",
+  "label": "yes",
+  "category": "imperative",
+  "source": "A"
+ },
+ {
+  "text": "Summarize your last project in two or three sentences.",
+  "label": "yes",
+  "category": "imperative",
+  "source": "A"
+ },
+ {
+  "text": "Introduce yourself briefly to the panel.",
+  "label": "yes",
+  "category": "imperative",
+  "source": "A"
+ },
+ {
+  "text": "Write a function that checks whether a string is a palindrome.",
+  "label": "yes",
+  "category": "imperative",
+  "source": "A"
+ },
+ {
+  "text": "Design a URL shortener that can handle a hundred million links.",
+  "label": "yes",
+  "category": "imperative",
+  "source": "A"
+ },
+ {
+  "text": "Estimate how many food delivery orders happen in Mumbai on a typical evening.",
+  "label": "yes",
+  "category": "imperative",
+  "source": "A"
+ },
+ {
+  "text": "Define eventual consistency in your own words.",
+  "label": "yes",
+  "category": "imperative",
+  "source": "A"
+ },
+ {
+  "text": "Outline what you'd do in your first ninety days.",
+  "label": "yes",
+  "category": "imperative",
+  "source": "A"
+ },
+ {
+  "text": "Take me through how you tracked down that memory leak.",
+  "label": "yes",
+  "category": "imperative",
+  "source": "A"
+ },
+ {
+  "text": "talk me through your resume starting with your most recent role",
+  "label": "yes",
+  "category": "imperative",
+  "source": "A"
+ },
+ {
+  "text": "Give me an example of a time you took ownership of something that was failing",
+  "label": "yes",
+  "category": "imperative",
+  "source": "A"
+ },
+ {
+  "text": "Pick one project from your resume and go deep on the architecture.",
+  "label": "yes",
+  "category": "imperative",
+  "source": "A"
+ },
+ {
+  "text": "Tell us about a decision you had to make with incomplete data.",
+  "label": "yes",
+  "category": "imperative",
+  "source": "A"
+ },
+ {
+  "text": "I'd like you to walk us through the trade-offs you made on the caching layer.",
+  "label": "yes",
+  "category": "indirect",
+  "source": "A"
+ },
+ {
+  "text": "It would help to hear how you prioritize bugs versus new features.",
+  "label": "yes",
+  "category": "indirect",
+  "source": "A"
+ },
+ {
+  "text": "Would you mind explaining the gap in your employment history?",
+  "label": "yes",
+  "category": "indirect",
+  "source": "A"
+ },
+ {
+  "text": "Let's talk about your experience leading the payments team.",
+  "label": "yes",
+  "category": "indirect",
+  "source": "A"
+ },
+ {
+  "text": "I'm curious how you approached the data migration at your last job.",
+  "label": "yes",
+  "category": "indirect",
+  "source": "A"
+ },
+ {
+  "text": "I'd love to hear what got you into data engineering in the first place.",
+  "label": "yes",
+  "category": "indirect",
+  "source": "A"
+ },
+ {
+  "text": "Could you give us a quick overview of how your current team is structured?",
+  "label": "yes",
+  "category": "indirect",
+  "source": "A"
+ },
+ {
+  "text": "I want to understand how you handle on-call escalations at night.",
+  "label": "yes",
+  "category": "indirect",
+  "source": "A"
+ },
+ {
+  "text": "Help me understand why you went with MongoDB over Postgres there.",
+  "label": "yes",
+  "category": "indirect",
+  "source": "A"
+ },
+ {
+  "text": "wondering what your expectations are around remote work",
+  "label": "yes",
+  "category": "indirect",
+  "source": "A"
+ },
+ {
+  "text": "I'd be interested to know how you measure whether a feature was successful.",
+  "label": "yes",
+  "category": "indirect",
+  "source": "A"
+ },
+ {
+  "text": "Maybe start by telling us what your day-to-day looks like in your current role.",
+  "label": "yes",
+  "category": "indirect",
+  "source": "A"
+ },
+ {
+  "text": "If you could quickly run through the numbers from last week's launch, that would be great.",
+  "label": "yes",
+  "category": "indirect",
+  "source": "A"
+ },
+ {
+  "text": "Feel free to share how code reviews work on your team.",
+  "label": "yes",
+  "category": "indirect",
+  "source": "A"
+ },
+ {
+  "text": "And your notice period?",
+  "label": "yes",
+  "category": "elliptical",
+  "source": "A"
+ },
+ {
+  "text": "Expected salary?",
+  "label": "yes",
+  "category": "elliptical",
+  "source": "A"
+ },
+ {
+  "text": "Favorite programming language?",
+  "label": "yes",
+  "category": "elliptical",
+  "source": "A"
+ },
+ {
+  "text": "And the budget for that rollout?",
+  "label": "yes",
+  "category": "elliptical",
+  "source": "A"
+ },
+ {
+  "text": "Any questions for us?",
+  "label": "yes",
+  "category": "elliptical",
+  "source": "A"
+ },
+ {
+  "text": "Big-O for that approach?",
+  "label": "yes",
+  "category": "elliptical",
+  "source": "A"
+ },
+ {
+  "text": "Availability for a second round sometime next week?",
+  "label": "yes",
+  "category": "elliptical",
+  "source": "A"
+ },
+ {
+  "text": "Why this company in particular?",
+  "label": "yes",
+  "category": "elliptical",
+  "source": "A"
+ },
+ {
+  "text": "any thoughts",
+  "label": "yes",
+  "category": "elliptical",
+  "source": "A"
+ },
+ {
+  "text": "Suppose the primary database goes down during peak traffic. What's your first move?",
+  "label": "yes",
+  "category": "hypothetical",
+  "source": "A"
+ },
+ {
+  "text": "Say a client asks for a feature that conflicts with the roadmap, how would you respond?",
+  "label": "yes",
+  "category": "hypothetical",
+  "source": "A"
+ },
+ {
+  "text": "Imagine you join and the codebase has zero tests. Where do you even start?",
+  "label": "yes",
+  "category": "hypothetical",
+  "source": "A"
+ },
+ {
+  "text": "Let's say you have two weeks and three critical bugs, how do you decide which one to fix first",
+  "label": "yes",
+  "category": "hypothetical",
+  "source": "A"
+ },
+ {
+  "text": "If a junior engineer pushed a breaking change to production on a Friday evening, what would you do?",
+  "label": "yes",
+  "category": "hypothetical",
+  "source": "A"
+ },
+ {
+  "text": "Assume API latency suddenly doubles right after a deploy. Talk me through how you'd investigate.",
+  "label": "yes",
+  "category": "hypothetical",
+  "source": "A"
+ },
+ {
+  "text": "What if the stakeholder rejects your design after you've already built half of it?",
+  "label": "yes",
+  "category": "hypothetical",
+  "source": "A"
+ },
+ {
+  "text": "Picture a situation where your manager takes credit for your work. How do you deal with that?",
+  "label": "yes",
+  "category": "hypothetical",
+  "source": "A"
+ },
+ {
+  "text": "suppose traffic grows ten times overnight what breaks first",
+  "label": "yes",
+  "category": "hypothetical",
+  "source": "A"
+ },
+ {
+  "text": "Can you elaborate on that a little?",
+  "label": "yes",
+  "category": "follow_up",
+  "source": "A"
+ },
+ {
+  "text": "Why do you say that?",
+  "label": "yes",
+  "category": "follow_up",
+  "source": "A"
+ },
+ {
+  "text": "Do you have another example, maybe from a different team?",
+  "label": "yes",
+  "category": "follow_up",
+  "source": "A"
+ },
+ {
+  "text": "And how did that turn out in the end?",
+  "label": "yes",
+  "category": "follow_up",
+  "source": "A"
+ },
+ {
+  "text": "Could you go a bit deeper on the indexing part?",
+  "label": "yes",
+  "category": "follow_up",
+  "source": "A"
+ },
+ {
+  "text": "and what was your specific role in that",
+  "label": "yes",
+  "category": "follow_up",
+  "source": "A"
+ },
+ {
+  "text": "Interesting. What would you do differently next time?",
+  "label": "yes",
+  "category": "follow_up",
+  "source": "A"
+ },
+ {
+  "text": "How so?",
+  "label": "yes",
+  "category": "follow_up",
+  "source": "A"
+ },
+ {
+  "text": "Sorry, could you repeat the last bit about the sharding key?",
+  "label": "yes",
+  "category": "follow_up",
+  "source": "A"
+ },
+ {
+  "text": "I explained the requirements to the team last week.",
+  "label": "no",
+  "category": "statement",
+  "source": "A"
+ },
+ {
+  "text": "She asked me to describe the architecture before this call.",
+  "label": "no",
+  "category": "statement",
+  "source": "A"
+ },
+ {
+  "text": "We'll discuss compensation in the next round.",
+  "label": "no",
+  "category": "statement",
+  "source": "A"
+ },
+ {
+  "text": "The last candidate designed a really clean solution for this one.",
+  "label": "no",
+  "category": "statement",
+  "source": "A"
+ },
+ {
+  "text": "The role involves a lot of cross-functional work with product and design.",
+  "label": "no",
+  "category": "statement",
+  "source": "A"
+ },
+ {
+  "text": "I was wondering the same thing when I first joined.",
+  "label": "no",
+  "category": "statement",
+  "source": "A"
+ },
+ {
+  "text": "Last quarter we compared three vendors and ended up going with Datadog.",
+  "label": "no",
+  "category": "statement",
+  "source": "A"
+ },
+ {
+  "text": "my manager asked why the release slipped",
+  "label": "no",
+  "category": "statement",
+  "source": "A"
+ },
+ {
+  "text": "What I like most about this team is the autonomy.",
+  "label": "no",
+  "category": "statement",
+  "source": "A"
+ },
+ {
+  "text": "How we ended up on this stack is honestly a long story.",
+  "label": "no",
+  "category": "statement",
+  "source": "A"
+ },
+ {
+  "text": "Why we picked Kafka mostly comes down to throughput.",
+  "label": "no",
+  "category": "statement",
+  "source": "A"
+ },
+ {
+  "text": "Hope you had a good weekend.",
+  "label": "no",
+  "category": "statement",
+  "source": "A"
+ },
+ {
+  "text": "Let me show you the architecture diagram we're using today.",
+  "label": "no",
+  "category": "announcement",
+  "source": "A"
+ },
+ {
+  "text": "I'll explain the format of today's interview first.",
+  "label": "no",
+  "category": "announcement",
+  "source": "A"
+ },
+ {
+  "text": "Let me tell you a bit about the team before we get started.",
+  "label": "no",
+  "category": "announcement",
+  "source": "A"
+ },
+ {
+  "text": "I'm going to describe the problem and then give you a few minutes to think.",
+  "label": "no",
+  "category": "announcement",
+  "source": "A"
+ },
+ {
+  "text": "First I'll walk you through the role, and then we'll get to your questions.",
+  "label": "no",
+  "category": "announcement",
+  "source": "A"
+ },
+ {
+  "text": "so let me just pull up the problem statement",
+  "label": "no",
+  "category": "announcement",
+  "source": "A"
+ },
+ {
+  "text": "Next I'm going to ask you a few questions about system design.",
+  "label": "no",
+  "category": "announcement",
+  "source": "A"
+ },
+ {
+  "text": "Let me explain how the take-home assignment works.",
+  "label": "no",
+  "category": "announcement",
+  "source": "A"
+ },
+ {
+  "text": "I'll send over the feedback by Friday?",
+  "label": "no",
+  "category": "announcement",
+  "source": "A"
+ },
+ {
+  "text": "Great answer, thanks.",
+  "label": "no",
+  "category": "acknowledgement",
+  "source": "A"
+ },
+ {
+  "text": "Thanks for taking us through that, really helpful.",
+  "label": "no",
+  "category": "acknowledgement",
+  "source": "A"
+ },
+ {
+  "text": "That makes sense.",
+  "label": "no",
+  "category": "acknowledgement",
+  "source": "A"
+ },
+ {
+  "text": "Perfect, that's exactly what I was looking for.",
+  "label": "no",
+  "category": "acknowledgement",
+  "source": "A"
+ },
+ {
+  "text": "Interesting approach.",
+  "label": "no",
+  "category": "acknowledgement",
+  "source": "A"
+ },
+ {
+  "text": "Nice, I like how you explained the trade-offs there.",
+  "label": "no",
+  "category": "acknowledgement",
+  "source": "A"
+ },
+ {
+  "text": "fair enough",
+  "label": "no",
+  "category": "acknowledgement",
+  "source": "A"
+ },
+ {
+  "text": "Good, that covers everything I wanted to ask about databases.",
+  "label": "no",
+  "category": "acknowledgement",
+  "source": "A"
+ },
+ {
+  "text": "Can you hear me okay?",
+  "label": "no",
+  "category": "logistics",
+  "source": "A"
+ },
+ {
+  "text": "Hang on, I'm sharing my screen now.",
+  "label": "no",
+  "category": "logistics",
+  "source": "A"
+ },
+ {
+  "text": "Give me one second, my internet is acting up.",
+  "label": "no",
+  "category": "logistics",
+  "source": "A"
+ },
+ {
+  "text": "I think you're on mute.",
+  "label": "no",
+  "category": "logistics",
+  "source": "A"
+ },
+ {
+  "text": "Sorry, you cut out for a moment there.",
+  "label": "no",
+  "category": "logistics",
+  "source": "A"
+ },
+ {
+  "text": "Can everyone see the slides?",
+  "label": "no",
+  "category": "logistics",
+  "source": "A"
+ },
+ {
+  "text": "Let's wait a couple of minutes for Priya to join.",
+  "label": "no",
+  "category": "logistics",
+  "source": "A"
+ },
+ {
+  "text": "I'm dropping the link to the doc in the chat.",
+  "label": "no",
+  "category": "logistics",
+  "source": "A"
+ },
+ {
+  "text": "hold on someone's at the door",
+  "label": "no",
+  "category": "logistics",
+  "source": "A"
+ },
+ {
+  "text": "That's the tricky part, right?",
+  "label": "no",
+  "category": "rhetorical",
+  "source": "A"
+ },
+ {
+  "text": "Scaling is always harder than it looks, isn't it?",
+  "label": "no",
+  "category": "rhetorical",
+  "source": "A"
+ },
+ {
+  "text": "We've all been there, you know?",
+  "label": "no",
+  "category": "rhetorical",
+  "source": "A"
+ },
+ {
+  "text": "I mean, what could possibly go wrong?",
+  "label": "no",
+  "category": "rhetorical",
+  "source": "A"
+ },
+ {
+  "text": "It's basically just a queue, right",
+  "label": "no",
+  "category": "rhetorical",
+  "source": "A"
+ },
+ {
+  "text": "Funny how deadlines always slip, huh?",
+  "label": "no",
+  "category": "rhetorical",
+  "source": "A"
+ },
+ {
+  "text": "You can tell me about that in the next round.",
+  "label": "no",
+  "category": "deferral",
+  "source": "A"
+ },
+ {
+  "text": "Let's hold that thought and come back to it later.",
+  "label": "no",
+  "category": "deferral",
+  "source": "A"
+ },
+ {
+  "text": "We can go over your salary expectations with HR separately.",
+  "label": "no",
+  "category": "deferral",
+  "source": "A"
+ },
+ {
+  "text": "Maybe explain that one offline, we're short on time.",
+  "label": "no",
+  "category": "deferral",
+  "source": "A"
+ },
+ {
+  "text": "Don't worry about answering that now, we'll circle back.",
+  "label": "no",
+  "category": "deferral",
+  "source": "A"
+ },
+ {
+  "text": "Send me the details over email after the call.",
+  "label": "no",
+  "category": "deferral",
+  "source": "A"
+ },
+ {
+  "text": "And then the next thing I wanted to",
+  "label": "no",
+  "category": "fragment",
+  "source": "A"
+ },
+ {
+  "text": "Can you tell me about the",
+  "label": "no",
+  "category": "fragment",
+  "source": "A"
+ },
+ {
+  "text": "What I'm trying to get at is",
+  "label": "no",
+  "category": "fragment",
+  "source": "A"
+ },
+ {
+  "text": "okay so um",
+  "label": "no",
+  "category": "fragment",
+  "source": "A"
+ },
+ {
+  "text": "If the user clicks on the",
+  "label": "no",
+  "category": "fragment",
+  "source": "A"
+ },
+ {
+  "text": "Imagine the message queue is backed up with a million events.",
+  "label": "either",
+  "category": "ambiguous",
+  "source": "A"
+ },
+ {
+  "text": "Let's talk about deployment.",
+  "label": "either",
+  "category": "ambiguous",
+  "source": "A"
+ },
+ {
+  "text": "your preferred tech stack",
+  "label": "either",
+  "category": "ambiguous",
+  "source": "A"
+ },
+ {
+  "text": "How's your day going so far?",
+  "label": "either",
+  "category": "ambiguous",
+  "source": "A"
+ },
+ {
+  "text": "So, microservices.",
+  "label": "either",
+  "category": "ambiguous",
+  "source": "A"
+ },
+ {
+  "text": "I'm not sure I followed that last part.",
+  "label": "either",
+  "category": "ambiguous",
+  "source": "A"
+ },
+ {
+  "text": "Okay, so you've got a list of a million user IDs and some of them are duplicates.",
+  "label": "either",
+  "category": "ambiguous",
+  "source": "A"
+ },
+ {
+  "text": "kafka versus rabbitmq",
+  "label": "either",
+  "category": "ambiguous",
+  "source": "A"
+ },
+ {
+  "text": "I see you spent three years at Flipkart.",
+  "label": "either",
+  "category": "ambiguous",
+  "source": "A"
+ },
+ {
+  "text": "Okay, so that's the problem.",
+  "label": "either",
+  "category": "ambiguous",
+  "source": "A"
+ },
+ {
+  "text": "So, um, how long have you been working with Kubernetes in production?",
+  "label": "yes",
+  "category": "direct",
+  "source": "B"
+ },
+ {
+  "text": "What made you leave your last company after only eight months?",
+  "label": "yes",
+  "category": "direct",
+  "source": "B"
+ },
+ {
+  "text": "What's the time complexity of your solution as it stands",
+  "label": "yes",
+  "category": "direct",
+  "source": "B"
+ },
+ {
+  "text": "Okay so what's your current CTC and what are you expecting?",
+  "label": "yes",
+  "category": "direct",
+  "source": "B"
+ },
+ {
+  "text": "Why do you think a hash map is better here than a sorted array?",
+  "label": "yes",
+  "category": "direct",
+  "source": "B"
+ },
+ {
+  "text": "how would you handle a situation where your manager disagrees with your estimate",
+  "label": "yes",
+  "category": "direct",
+  "source": "B"
+ },
+ {
+  "text": "Are you comfortable relocating to Pune, or are you only looking at remote roles?",
+  "label": "yes",
+  "category": "direct",
+  "source": "B"
+ },
+ {
+  "text": "Right, and which database did you end up choosing for the ledger service?",
+  "label": "yes",
+  "category": "direct",
+  "source": "B"
+ },
+ {
+  "text": "Did you consider using a message queue there or was it all synchronous",
+  "label": "yes",
+  "category": "direct",
+  "source": "B"
+ },
+ {
+  "text": "Where do you see the bottleneck in this design once we hit, say, ten thousand writes a second?",
+  "label": "yes",
+  "category": "direct",
+  "source": "B"
+ },
+ {
+  "text": "So what's the difference between a process and a thread, in your own words?",
+  "label": "yes",
+  "category": "direct",
+  "source": "B"
+ },
+ {
+  "text": "What would your previous manager say is the area you most need to grow in?",
+  "label": "yes",
+  "category": "direct",
+  "source": "B"
+ },
+ {
+  "text": "When could you realistically start, if we made you an offer?",
+  "label": "yes",
+  "category": "direct",
+  "source": "B"
+ },
+ {
+  "text": "You are having how many years of experience in Java, exactly?",
+  "label": "yes",
+  "category": "direct",
+  "source": "B"
+ },
+ {
+  "text": "What is your good name and from where you are joining today?",
+  "label": "yes",
+  "category": "direct",
+  "source": "B"
+ },
+ {
+  "text": "Tell me one thing, why you want to switch so early in your career?",
+  "label": "yes",
+  "category": "direct",
+  "source": "B"
+ },
+ {
+  "text": "So yeah, um, have you ever had to roll back a deployment, like, on a Friday evening or something?",
+  "label": "yes",
+  "category": "direct",
+  "source": "B"
+ },
+ {
+  "text": "Talk me through how you'd design a URL shortener, starting from the API.",
+  "label": "yes",
+  "category": "imperative",
+  "source": "B"
+ },
+ {
+  "text": "Describe a time you had to deliver bad news to a stakeholder.",
+  "label": "yes",
+  "category": "imperative",
+  "source": "B"
+ },
+ {
+  "text": "Explain the CAP theorem as if you're explaining it to a product manager.",
+  "label": "yes",
+  "category": "imperative",
+  "source": "B"
+ },
+ {
+  "text": "Go ahead and write a function that reverses a linked list, iteratively first.",
+  "label": "yes",
+  "category": "imperative",
+  "source": "B"
+ },
+ {
+  "text": "Sketch out the data model for the orders table.",
+  "label": "yes",
+  "category": "imperative",
+  "source": "B"
+ },
+ {
+  "text": "Estimate how many piano tuners there are in London, just roughly.",
+  "label": "yes",
+  "category": "imperative",
+  "source": "B"
+ },
+ {
+  "text": "Compare REST and gRPC for this particular use case.",
+  "label": "yes",
+  "category": "imperative",
+  "source": "B"
+ },
+ {
+  "text": "Give me an example of when you pushed back on a requirement.",
+  "label": "yes",
+  "category": "imperative",
+  "source": "B"
+ },
+ {
+  "text": "Summarise the main risks you see with this rollout plan.",
+  "label": "yes",
+  "category": "imperative",
+  "source": "B"
+ },
+ {
+  "text": "Run me through your CV quickly, just the last two roles.",
+  "label": "yes",
+  "category": "imperative",
+  "source": "B"
+ },
+ {
+  "text": "walk us through what happened during the outage from your side",
+  "label": "yes",
+  "category": "imperative",
+  "source": "B"
+ },
+ {
+  "text": "Justify why you'd go with eventual consistency there.",
+  "label": "yes",
+  "category": "imperative",
+  "source": "B"
+ },
+ {
+  "text": "List the edge cases you'd want to test for this function.",
+  "label": "yes",
+  "category": "imperative",
+  "source": "B"
+ },
+ {
+  "text": "Okay, now optimise it so it runs in linear time and tell me what changes.",
+  "label": "yes",
+  "category": "imperative",
+  "source": "B"
+ },
+ {
+  "text": "Define idempotency and tell me why it matters for payment APIs.",
+  "label": "yes",
+  "category": "imperative",
+  "source": "B"
+ },
+ {
+  "text": "Pull up the code and explain what the retry logic is actually doing.",
+  "label": "yes",
+  "category": "imperative",
+  "source": "B"
+ },
+ {
+  "text": "Convince me that we should rewrite this service in Rust.",
+  "label": "yes",
+  "category": "imperative",
+  "source": "B"
+ },
+ {
+  "text": "I'd love to hear how you approached mentoring the junior engineers on your team.",
+  "label": "yes",
+  "category": "indirect",
+  "source": "B"
+ },
+ {
+  "text": "I was wondering if you could tell us a bit about why you're interested in this role.",
+  "label": "yes",
+  "category": "indirect",
+  "source": "B"
+ },
+ {
+  "text": "It would be great if you could explain how you'd scale the read path.",
+  "label": "yes",
+  "category": "indirect",
+  "source": "B"
+ },
+ {
+  "text": "I'm curious what your take is on microservices versus a modular monolith.",
+  "label": "yes",
+  "category": "indirect",
+  "source": "B"
+ },
+ {
+  "text": "Can you just quickly elaborate on the caching layer you mentioned?",
+  "label": "yes",
+  "category": "indirect",
+  "source": "B"
+ },
+ {
+  "text": "Would you mind telling me a little more about the gap on your resume between 2021 and 2022?",
+  "label": "yes",
+  "category": "indirect",
+  "source": "B"
+ },
+ {
+  "text": "Could you possibly talk about a time when a project didn't go to plan.",
+  "label": "yes",
+  "category": "indirect",
+  "source": "B"
+ },
+ {
+  "text": "Help me understand why the migration took three months instead of three weeks.",
+  "label": "yes",
+  "category": "indirect",
+  "source": "B"
+ },
+ {
+  "text": "I'd be interested to know how you measure success for a feature launch.",
+  "label": "yes",
+  "category": "indirect",
+  "source": "B"
+ },
+ {
+  "text": "you mentioned leading a team of six, i'd like to know more about that",
+  "label": "yes",
+  "category": "indirect",
+  "source": "B"
+ },
+ {
+  "text": "Kindly let me know your expected salary and your earliest joining date.",
+  "label": "yes",
+  "category": "indirect",
+  "source": "B"
+ },
+ {
+  "text": "Do you want to take a stab at the bonus question on the whiteboard?",
+  "label": "yes",
+  "category": "indirect",
+  "source": "B"
+ },
+ {
+  "text": "so yeah basically what we want to understand is like how you'd go about designing the notification system for, you know, millions of users, push, email, SMS, all of it",
+  "label": "yes",
+  "category": "indirect",
+  "source": "B"
+ },
+ {
+  "text": "I'm just keen to understand how you'd handle a really difficult client, if that's alright.",
+  "label": "yes",
+  "category": "indirect",
+  "source": "B"
+ },
+ {
+  "text": "Could you talk us through your approach to testing, if you don't mind",
+  "label": "yes",
+  "category": "indirect",
+  "source": "B"
+ },
+ {
+  "text": "Mind giving us a quick overview of the tech stack you used there?",
+  "label": "yes",
+  "category": "indirect",
+  "source": "B"
+ },
+ {
+  "text": "Your current location?",
+  "label": "yes",
+  "category": "elliptical",
+  "source": "B"
+ },
+ {
+  "text": "Expected CTC?",
+  "label": "yes",
+  "category": "elliptical",
+  "source": "B"
+ },
+ {
+  "text": "And the space complexity?",
+  "label": "yes",
+  "category": "elliptical",
+  "source": "B"
+ },
+ {
+  "text": "Reason for the job change?",
+  "label": "yes",
+  "category": "elliptical",
+  "source": "B"
+ },
+ {
+  "text": "Preferred language for the coding round",
+  "label": "yes",
+  "category": "elliptical",
+  "source": "B"
+ },
+ {
+  "text": "Any experience with Terraform?",
+  "label": "yes",
+  "category": "elliptical",
+  "source": "B"
+ },
+ {
+  "text": "Years of experience with React",
+  "label": "yes",
+  "category": "elliptical",
+  "source": "B"
+ },
+ {
+  "text": "Notice period?",
+  "label": "yes",
+  "category": "elliptical",
+  "source": "B"
+ },
+ {
+  "text": "And for the failure case, same thing?",
+  "label": "yes",
+  "category": "elliptical",
+  "source": "B"
+ },
+ {
+  "text": "Thoughts?",
+  "label": "yes",
+  "category": "elliptical",
+  "source": "B"
+ },
+ {
+  "text": "Visa status, do you need sponsorship",
+  "label": "yes",
+  "category": "elliptical",
+  "source": "B"
+ },
+ {
+  "text": "Let's say your primary database goes down at 2 a.m. and you're on call. What do you do first?",
+  "label": "yes",
+  "category": "hypothetical",
+  "source": "B"
+ },
+ {
+  "text": "Imagine the product team wants this feature in two weeks but you think it needs six. How do you handle that?",
+  "label": "yes",
+  "category": "hypothetical",
+  "source": "B"
+ },
+ {
+  "text": "Suppose we have a billion users and each one uploads a photo a day, how would the storage layer look",
+  "label": "yes",
+  "category": "hypothetical",
+  "source": "B"
+ },
+ {
+  "text": "If you had to cut the scope of this project in half, what would you keep?",
+  "label": "yes",
+  "category": "hypothetical",
+  "source": "B"
+ },
+ {
+  "text": "Say a teammate keeps missing deadlines and it's affecting the whole sprint, what's your move?",
+  "label": "yes",
+  "category": "hypothetical",
+  "source": "B"
+ },
+ {
+  "text": "Assume the input array can have duplicates. Does your approach still work?",
+  "label": "yes",
+  "category": "hypothetical",
+  "source": "B"
+ },
+ {
+  "text": "Picture this: a customer escalates straight to the CEO about a bug you shipped. Take me through the next twenty-four hours.",
+  "label": "yes",
+  "category": "hypothetical",
+  "source": "B"
+ },
+ {
+  "text": "What if the network partitions right in the middle of the transaction?",
+  "label": "yes",
+  "category": "hypothetical",
+  "source": "B"
+ },
+ {
+  "text": "Let's assume you join and on day one you find there are basically no tests in the codebase, how would you go about it.",
+  "label": "yes",
+  "category": "hypothetical",
+  "source": "B"
+ },
+ {
+  "text": "Hypothetically, if your current company made you a counter offer, would you stay?",
+  "label": "yes",
+  "category": "hypothetical",
+  "source": "B"
+ },
+ {
+  "text": "And why did you choose that over Redis?",
+  "label": "yes",
+  "category": "follow_up",
+  "source": "B"
+ },
+ {
+  "text": "Okay, can you go a bit deeper on that?",
+  "label": "yes",
+  "category": "follow_up",
+  "source": "B"
+ },
+ {
+  "text": "What happened after that?",
+  "label": "yes",
+  "category": "follow_up",
+  "source": "B"
+ },
+ {
+  "text": "Sorry, how exactly did you measure that twenty percent improvement?",
+  "label": "yes",
+  "category": "follow_up",
+  "source": "B"
+ },
+ {
+  "text": "So, um, what was your specific contribution there, versus the team's?",
+  "label": "yes",
+  "category": "follow_up",
+  "source": "B"
+ },
+ {
+  "text": "Interesting. And how did that hold up when traffic doubled?",
+  "label": "yes",
+  "category": "follow_up",
+  "source": "B"
+ },
+ {
+  "text": "Right, right. But what if the user is offline?",
+  "label": "yes",
+  "category": "follow_up",
+  "source": "B"
+ },
+ {
+  "text": "can you give a concrete example of that",
+  "label": "yes",
+  "category": "follow_up",
+  "source": "B"
+ },
+ {
+  "text": "And then?",
+  "label": "yes",
+  "category": "follow_up",
+  "source": "B"
+ },
+ {
+  "text": "I asked the previous candidate the same question and they really struggled with it.",
+  "label": "no",
+  "category": "statement",
+  "source": "B"
+ },
+ {
+  "text": "Our team usually explains the architecture to new joiners during their first week.",
+  "label": "no",
+  "category": "statement",
+  "source": "B"
+ },
+ {
+  "text": "The client wants us to describe the whole flow in the proposal by Friday.",
+  "label": "no",
+  "category": "statement",
+  "source": "B"
+ },
+ {
+  "text": "I was asked to tell you that the second round will be with the VP of Engineering.",
+  "label": "no",
+  "category": "statement",
+  "source": "B"
+ },
+ {
+  "text": "We normally ask candidates to walk through a project, but we're a bit short on time today.",
+  "label": "no",
+  "category": "statement",
+  "source": "B"
+ },
+ {
+  "text": "My manager always tells me to explain things more simply, so I'm working on that.",
+  "label": "no",
+  "category": "statement",
+  "source": "B"
+ },
+ {
+  "text": "Rahul explained the caching design to me yesterday, it's quite neat actually.",
+  "label": "no",
+  "category": "statement",
+  "source": "B"
+ },
+ {
+  "text": "The question everyone keeps asking is whether we'll hit the deadline, and frankly I don't know.",
+  "label": "no",
+  "category": "statement",
+  "source": "B"
+ },
+ {
+  "text": "Yeah so the panel will ask you about system design in the next round",
+  "label": "no",
+  "category": "statement",
+  "source": "B"
+ },
+ {
+  "text": "Priya wanted to know how long the migration would take, so I told her about six weeks.",
+  "label": "no",
+  "category": "statement",
+  "source": "B"
+ },
+ {
+  "text": "We were told to share our screens and explain our designs at the all-hands.",
+  "label": "no",
+  "category": "statement",
+  "source": "B"
+ },
+ {
+  "text": "The customer asked whether we support SSO and I said yes, we do?",
+  "label": "no",
+  "category": "statement",
+  "source": "B"
+ },
+ {
+  "text": "So I'm going to give you a coding problem now, and you'll have about forty minutes for it.",
+  "label": "no",
+  "category": "announcement",
+  "source": "B"
+ },
+ {
+  "text": "Let me explain how the rest of today's process works.",
+  "label": "no",
+  "category": "announcement",
+  "source": "B"
+ },
+ {
+  "text": "I'll start by telling you a bit about the team and then we'll move on.",
+  "label": "no",
+  "category": "announcement",
+  "source": "B"
+ },
+ {
+  "text": "Next, I'll share my screen and show you the problem statement.",
+  "label": "no",
+  "category": "announcement",
+  "source": "B"
+ },
+ {
+  "text": "Okay, after this I'll ask you a couple of behavioural questions.",
+  "label": "no",
+  "category": "announcement",
+  "source": "B"
+ },
+ {
+  "text": "let me just pull up your resume real quick",
+  "label": "no",
+  "category": "announcement",
+  "source": "B"
+ },
+ {
+  "text": "I'm going to paste the question in the chat now?",
+  "label": "no",
+  "category": "announcement",
+  "source": "B"
+ },
+ {
+  "text": "So first I'll describe the system and after that you can ask clarifying questions.",
+  "label": "no",
+  "category": "announcement",
+  "source": "B"
+ },
+ {
+  "text": "Before we begin, I'll just give you some context on the product.",
+  "label": "no",
+  "category": "announcement",
+  "source": "B"
+ },
+ {
+  "text": "Okay, that makes sense.",
+  "label": "no",
+  "category": "acknowledgement",
+  "source": "B"
+ },
+ {
+  "text": "Great, thanks for that, really helpful.",
+  "label": "no",
+  "category": "acknowledgement",
+  "source": "B"
+ },
+ {
+  "text": "Mm-hmm, yeah, got it.",
+  "label": "no",
+  "category": "acknowledgement",
+  "source": "B"
+ },
+ {
+  "text": "That's a really good answer, actually.",
+  "label": "no",
+  "category": "acknowledgement",
+  "source": "B"
+ },
+ {
+  "text": "Perfect. Yeah, that's exactly what I was looking for?",
+  "label": "no",
+  "category": "acknowledgement",
+  "source": "B"
+ },
+ {
+  "text": "Fair enough, I can see why you went that way.",
+  "label": "no",
+  "category": "acknowledgement",
+  "source": "B"
+ },
+ {
+  "text": "Right, so you used Kafka for the event stream. Okay.",
+  "label": "no",
+  "category": "acknowledgement",
+  "source": "B"
+ },
+ {
+  "text": "Brilliant, cheers for that.",
+  "label": "no",
+  "category": "acknowledgement",
+  "source": "B"
+ },
+ {
+  "text": "hmm okay interesting",
+  "label": "no",
+  "category": "acknowledgement",
+  "source": "B"
+ },
+ {
+  "text": "Can you hear me okay?",
+  "label": "no",
+  "category": "logistics",
+  "source": "B"
+ },
+ {
+  "text": "Sorry, you're breaking up a little bit.",
+  "label": "no",
+  "category": "logistics",
+  "source": "B"
+ },
+ {
+  "text": "Is my screen visible to everyone?",
+  "label": "no",
+  "category": "logistics",
+  "source": "B"
+ },
+ {
+  "text": "I think you're on mute.",
+  "label": "no",
+  "category": "logistics",
+  "source": "B"
+ },
+ {
+  "text": "Give me one second, my laptop is restarting.",
+  "label": "no",
+  "category": "logistics",
+  "source": "B"
+ },
+ {
+  "text": "Let's take a five minute break and reconvene at quarter past.",
+  "label": "no",
+  "category": "logistics",
+  "source": "B"
+ },
+ {
+  "text": "We've got about ten minutes left, so we'll need to wrap up soon.",
+  "label": "no",
+  "category": "logistics",
+  "source": "B"
+ },
+ {
+  "text": "could you turn your camera on please",
+  "label": "no",
+  "category": "logistics",
+  "source": "B"
+ },
+ {
+  "text": "The link for the next round will be sent to your email by HR.",
+  "label": "no",
+  "category": "logistics",
+  "source": "B"
+ },
+ {
+  "text": "Can you see the shared doc now",
+  "label": "no",
+  "category": "logistics",
+  "source": "B"
+ },
+ {
+  "text": "I mean, who doesn't love a good legacy codebase, right?",
+  "label": "no",
+  "category": "rhetorical",
+  "source": "B"
+ },
+ {
+  "text": "Why do we even have three different logging libraries? Nobody knows.",
+  "label": "no",
+  "category": "rhetorical",
+  "source": "B"
+ },
+ {
+  "text": "It's a bit of a mess, isn't it? Anyway, moving on.",
+  "label": "no",
+  "category": "rhetorical",
+  "source": "B"
+ },
+ {
+  "text": "How hard can it be, right? Famous last words.",
+  "label": "no",
+  "category": "rhetorical",
+  "source": "B"
+ },
+ {
+  "text": "You know what I mean? So yeah, the deadline got pushed again.",
+  "label": "no",
+  "category": "rhetorical",
+  "source": "B"
+ },
+ {
+  "text": "So what does that tell us? It tells us the cache hit rate is way too low.",
+  "label": "no",
+  "category": "rhetorical",
+  "source": "B"
+ },
+ {
+  "text": "And guess what, the bug was in the config file all along.",
+  "label": "no",
+  "category": "rhetorical",
+  "source": "B"
+ },
+ {
+  "text": "Hope you're having a good week so far.",
+  "label": "no",
+  "category": "smalltalk",
+  "source": "B"
+ },
+ {
+  "text": "Oh, it's absolutely pouring here in Manchester, typical.",
+  "label": "no",
+  "category": "smalltalk",
+  "source": "B"
+ },
+ {
+  "text": "Happy Diwali in advance, by the way.",
+  "label": "no",
+  "category": "smalltalk",
+  "source": "B"
+ },
+ {
+  "text": "Nice to meet you, I'm Priya, I lead the platform team here.",
+  "label": "no",
+  "category": "smalltalk",
+  "source": "B"
+ },
+ {
+  "text": "We can come back to the salary discussion later with HR.",
+  "label": "no",
+  "category": "deferral",
+  "source": "B"
+ },
+ {
+  "text": "Let's park that question for now and revisit it at the end.",
+  "label": "no",
+  "category": "deferral",
+  "source": "B"
+ },
+ {
+  "text": "Don't worry about answering that right now, have a think and email me.",
+  "label": "no",
+  "category": "deferral",
+  "source": "B"
+ },
+ {
+  "text": "Hold that thought, we'll get to the database part in a bit.",
+  "label": "no",
+  "category": "deferral",
+  "source": "B"
+ },
+ {
+  "text": "So if you were to, um, like—",
+  "label": "no",
+  "category": "fragment",
+  "source": "B"
+ },
+ {
+  "text": "And the other thing I wanted to ask was",
+  "label": "no",
+  "category": "fragment",
+  "source": "B"
+ },
+ {
+  "text": "Can you tell me about the",
+  "label": "no",
+  "category": "fragment",
+  "source": "B"
+ },
+ {
+  "text": "What would you, uh, actually, never mind.",
+  "label": "no",
+  "category": "fragment",
+  "source": "B"
+ },
+ {
+  "text": "how would you",
+  "label": "no",
+  "category": "fragment",
+  "source": "B"
+ },
+ {
+  "text": "Okay, can you see my screen? Great, are you ready to begin?",
+  "label": "either",
+  "category": "ambiguous",
+  "source": "B"
+ },
+ {
+  "text": "So that's the problem statement, it's pretty open-ended.",
+  "label": "either",
+  "category": "ambiguous",
+  "source": "B"
+ },
+ {
+  "text": "Any questions for me before we wrap up?",
+  "label": "either",
+  "category": "ambiguous",
+  "source": "B"
+ },
+ {
+  "text": "So, Kafka or RabbitMQ, I keep going back and forth on it.",
+  "label": "either",
+  "category": "ambiguous",
+  "source": "B"
+ },
+ {
+  "text": "You've used Go before, I think?",
+  "label": "either",
+  "category": "ambiguous",
+  "source": "B"
+ },
+ {
+  "text": "I'm not sure the indexing approach would hold up under load.",
+  "label": "either",
+  "category": "ambiguous",
+  "source": "B"
+ },
+ {
+  "text": "How's everything going on your end?",
+  "label": "either",
+  "category": "ambiguous",
+  "source": "B"
+ },
+ {
+  "text": "we were hoping someone on this call has dealt with SOC 2 audits before",
+  "label": "either",
+  "category": "ambiguous",
+  "source": "B"
+ },
+ {
+  "text": "So you were at Flipkart for about three years.",
+  "label": "either",
+  "category": "ambiguous",
+  "source": "B"
+ },
+ {
+  "text": "Feel free to jump in if you've got anything to add",
+  "label": "either",
+  "category": "ambiguous",
+  "source": "B"
+ },
+ {
+  "text": "So what's the time complexity of your solution if the input array is already sorted?",
+  "label": "yes",
+  "category": "direct",
+  "source": "C"
+ },
+ {
+  "text": "How would you handle a hot partition in Kafka when one customer ID is getting most of the traffic?",
+  "label": "yes",
+  "category": "direct",
+  "source": "C"
+ },
+ {
+  "text": "what made you leave your last company after just eight months",
+  "label": "yes",
+  "category": "direct",
+  "source": "C"
+ },
+ {
+  "text": "Um, so, have you worked with Terraform, or was it mostly CloudFormation at your previous place?",
+  "label": "yes",
+  "category": "direct",
+  "source": "C"
+ },
+ {
+  "text": "whats your current ctc and what are you expecting from this move",
+  "label": "yes",
+  "category": "direct",
+  "source": "C"
+ },
+ {
+  "text": "Are you open to relocating to Pune, or are you only considering remote roles?",
+  "label": "yes",
+  "category": "direct",
+  "source": "C"
+ },
+ {
+  "text": "Why did you go with a B-tree index here and not a hash index.",
+  "label": "yes",
+  "category": "direct",
+  "source": "C"
+ },
+ {
+  "text": "What is the difference between precision and recall, and in which situation would you prefer one over the other?",
+  "label": "yes",
+  "category": "direct",
+  "source": "C"
+ },
+ {
+  "text": "In your thesis, how did you validate that the simulation results actually match real-world measurements?",
+  "label": "yes",
+  "category": "direct",
+  "source": "C"
+ },
+ {
+  "text": "When can your team realistically have the API ready for us to start integration testing?",
+  "label": "yes",
+  "category": "direct",
+  "source": "C"
+ },
+ {
+  "text": "Do you think, uh, we can squeeze the payment refactor into this sprint, or is that too ambitious?",
+  "label": "yes",
+  "category": "direct",
+  "source": "C"
+ },
+ {
+  "text": "How are you feeling about your workload these days, honestly?",
+  "label": "yes",
+  "category": "direct",
+  "source": "C"
+ },
+ {
+  "text": "What actually happens with useEffect if you pass an empty dependency array",
+  "label": "yes",
+  "category": "direct",
+  "source": "C"
+ },
+ {
+  "text": "Have you ever had to roll back a production deployment? What happened?",
+  "label": "yes",
+  "category": "direct",
+  "source": "C"
+ },
+ {
+  "text": "So how would you, like, detect data drift once the model is in production?",
+  "label": "yes",
+  "category": "direct",
+  "source": "C"
+ },
+ {
+  "text": "What's the difference between a LEFT JOIN and an INNER JOIN when the right table has no matching rows?",
+  "label": "yes",
+  "category": "direct",
+  "source": "C"
+ },
+ {
+  "text": "Do you have any questions for us?",
+  "label": "yes",
+  "category": "direct",
+  "source": "C"
+ },
+ {
+  "text": "How would you rate yourself in SQL on a scale of one to ten?",
+  "label": "yes",
+  "category": "direct",
+  "source": "C"
+ },
+ {
+  "text": "What is your highest qualification and in which year did you pass out",
+  "label": "yes",
+  "category": "direct",
+  "source": "C"
+ },
+ {
+  "text": "Okay so how would you make this dropdown accessible for someone using a screen reader?",
+  "label": "yes",
+  "category": "direct",
+  "source": "C"
+ },
+ {
+  "text": "What's one thing I could be doing differently to support you better?",
+  "label": "yes",
+  "category": "direct",
+  "source": "C"
+ },
+ {
+  "text": "Gotcha. So how'd y'all handle on-call at your last gig, was there like a rotation or just whoever was around?",
+  "label": "yes",
+  "category": "direct",
+  "source": "C"
+ },
+ {
+  "text": "Write a function that returns the first non-repeating character in a string.",
+  "label": "yes",
+  "category": "imperative",
+  "source": "C"
+ },
+ {
+  "text": "So, um, talk me through how you'd design a URL shortener that has to handle a hundred million requests a day.",
+  "label": "yes",
+  "category": "imperative",
+  "source": "C"
+ },
+ {
+  "text": "Explain the difference between a process and a thread, in simple terms.",
+  "label": "yes",
+  "category": "imperative",
+  "source": "C"
+ },
+ {
+  "text": "So yeah, describe a time you disagreed with your manager and how you handled it.",
+  "label": "yes",
+  "category": "imperative",
+  "source": "C"
+ },
+ {
+  "text": "Take me through your approach before you start coding.",
+  "label": "yes",
+  "category": "imperative",
+  "source": "C"
+ },
+ {
+  "text": "Sketch out the high-level architecture for a food delivery app, just the main components.",
+  "label": "yes",
+  "category": "imperative",
+  "source": "C"
+ },
+ {
+  "text": "Compare REST and GraphQL for a mobile client on a really flaky network.",
+  "label": "yes",
+  "category": "imperative",
+  "source": "C"
+ },
+ {
+  "text": "please explain the CAP theorem with an example",
+  "label": "yes",
+  "category": "imperative",
+  "source": "C"
+ },
+ {
+  "text": "Walk us through the CI/CD pipeline you set up at your last company, starting from the commit.",
+  "label": "yes",
+  "category": "imperative",
+  "source": "C"
+ },
+ {
+  "text": "Define overfitting and list a few ways to prevent it.",
+  "label": "yes",
+  "category": "imperative",
+  "source": "C"
+ },
+ {
+  "text": "Optimise this query for me, it's doing a full table scan on the orders table.",
+  "label": "yes",
+  "category": "imperative",
+  "source": "C"
+ },
+ {
+  "text": "Summarise what you've understood of the requirements so far, just so we're aligned.",
+  "label": "yes",
+  "category": "imperative",
+  "source": "C"
+ },
+ {
+  "text": "Derive the gradient of the softmax cross-entropy loss with respect to the logits.",
+  "label": "yes",
+  "category": "imperative",
+  "source": "C"
+ },
+ {
+  "text": "Okay so, uh, start by telling me how you'd structure the Dockerfile for this service, like what goes in each layer",
+  "label": "yes",
+  "category": "imperative",
+  "source": "C"
+ },
+ {
+  "text": "I'd be keen to hear how you approached the migration from MongoDB to Postgres.",
+  "label": "yes",
+  "category": "indirect",
+  "source": "C"
+ },
+ {
+  "text": "I was wondering if you could explain why you chose eventual consistency there.",
+  "label": "yes",
+  "category": "indirect",
+  "source": "C"
+ },
+ {
+  "text": "It would be helpful to know your expected date of joining.",
+  "label": "yes",
+  "category": "indirect",
+  "source": "C"
+ },
+ {
+  "text": "I'm curious how you'd go about testing this without mocking the database?",
+  "label": "yes",
+  "category": "indirect",
+  "source": "C"
+ },
+ {
+  "text": "Would you mind telling us why you're looking for a change at this point?",
+  "label": "yes",
+  "category": "indirect",
+  "source": "C"
+ },
+ {
+  "text": "I'd like to understand your experience with Kubernetes in production, like, not just minikube on your laptop.",
+  "label": "yes",
+  "category": "indirect",
+  "source": "C"
+ },
+ {
+  "text": "So I want to get a sense of how you prioritise when literally everything is marked P0.",
+  "label": "yes",
+  "category": "indirect",
+  "source": "C"
+ },
+ {
+  "text": "Can you just quickly tell me your current notice period",
+  "label": "yes",
+  "category": "indirect",
+  "source": "C"
+ },
+ {
+  "text": "Let's hear your thoughts on how we should split the frontend work between the two squads.",
+  "label": "yes",
+  "category": "indirect",
+  "source": "C"
+ },
+ {
+  "text": "I didn't quite follow how the cache gets invalidated, maybe you can clarify that.",
+  "label": "yes",
+  "category": "indirect",
+  "source": "C"
+ },
+ {
+  "text": "you know I'd be interested to know like what size of team you've actually managed before",
+  "label": "yes",
+  "category": "indirect",
+  "source": "C"
+ },
+ {
+  "text": "Kindly let us know your expected CTC and whether it is negotiable.",
+  "label": "yes",
+  "category": "indirect",
+  "source": "C"
+ },
+ {
+  "text": "So the thing is we've been going back and forth internally and, um, if you could share your view on whether we go fixed bid or time and materials, that would really help us decide.",
+  "label": "yes",
+  "category": "indirect",
+  "source": "C"
+ },
+ {
+  "text": "I'd appreciate it if you could clarify the methodology section a little, particularly how you selected your sample.",
+  "label": "yes",
+  "category": "indirect",
+  "source": "C"
+ },
+ {
+  "text": "And the space complexity?",
+  "label": "yes",
+  "category": "elliptical",
+  "source": "C"
+ },
+ {
+  "text": "Expected salary?",
+  "label": "yes",
+  "category": "elliptical",
+  "source": "C"
+ },
+ {
+  "text": "any hands on experience with spark",
+  "label": "yes",
+  "category": "elliptical",
+  "source": "C"
+ },
+ {
+  "text": "Reason for the gap in 2022?",
+  "label": "yes",
+  "category": "elliptical",
+  "source": "C"
+ },
+ {
+  "text": "Favourite design pattern and why.",
+  "label": "yes",
+  "category": "elliptical",
+  "source": "C"
+ },
+ {
+  "text": "Python or Java for the coding round?",
+  "label": "yes",
+  "category": "elliptical",
+  "source": "C"
+ },
+ {
+  "text": "Thoughts?",
+  "label": "yes",
+  "category": "elliptical",
+  "source": "C"
+ },
+ {
+  "text": "total experience and relevant experience",
+  "label": "yes",
+  "category": "elliptical",
+  "source": "C"
+ },
+ {
+  "text": "Suppose the payment service goes down in the middle of a checkout. What does the user see?",
+  "label": "yes",
+  "category": "hypothetical",
+  "source": "C"
+ },
+ {
+  "text": "Let's say, you know, you join and in your first week you find out the codebase has zero tests. What do you do?",
+  "label": "yes",
+  "category": "hypothetical",
+  "source": "C"
+ },
+ {
+  "text": "Imagine your model has 99% accuracy but the business team says it's useless. Why might that be?",
+  "label": "yes",
+  "category": "hypothetical",
+  "source": "C"
+ },
+ {
+  "text": "If traffic suddenly spiked ten times during a flash sale, which part of your design breaks first?",
+  "label": "yes",
+  "category": "hypothetical",
+  "source": "C"
+ },
+ {
+  "text": "What if two users edit the same document at exactly the same time?",
+  "label": "yes",
+  "category": "hypothetical",
+  "source": "C"
+ },
+ {
+  "text": "say a teammate keeps missing deadlines and it's affecting your deliverables how would you deal with that",
+  "label": "yes",
+  "category": "hypothetical",
+  "source": "C"
+ },
+ {
+  "text": "Assume the input doesn't fit in memory. Now how does your approach change?",
+  "label": "yes",
+  "category": "hypothetical",
+  "source": "C"
+ },
+ {
+  "text": "Let's assume the client changes the scope two days before release, how would you handle that conversation?",
+  "label": "yes",
+  "category": "hypothetical",
+  "source": "C"
+ },
+ {
+  "text": "Okay, hypothetically, if we gave you zero budget for infrastructure, where would you host this?",
+  "label": "yes",
+  "category": "hypothetical",
+  "source": "C"
+ },
+ {
+  "text": "Suppose a pod keeps going into CrashLoopBackOff right after a deploy. How would you debug it?",
+  "label": "yes",
+  "category": "hypothetical",
+  "source": "C"
+ },
+ {
+  "text": "Why though?",
+  "label": "yes",
+  "category": "follow_up",
+  "source": "C"
+ },
+ {
+  "text": "Can you go a bit deeper on that last point?",
+  "label": "yes",
+  "category": "follow_up",
+  "source": "C"
+ },
+ {
+  "text": "Hmm, but wouldn't that cause a race condition between the two workers?",
+  "label": "yes",
+  "category": "follow_up",
+  "source": "C"
+ },
+ {
+  "text": "And how did you measure that the latency actually improved?",
+  "label": "yes",
+  "category": "follow_up",
+  "source": "C"
+ },
+ {
+  "text": "Sorry, just to clarify, was that your decision or your lead's?",
+  "label": "yes",
+  "category": "follow_up",
+  "source": "C"
+ },
+ {
+  "text": "Right, right, and the stakeholders, how did they react to that?",
+  "label": "yes",
+  "category": "follow_up",
+  "source": "C"
+ },
+ {
+  "text": "You mentioned Redis earlier. What exactly were you using it for?",
+  "label": "yes",
+  "category": "follow_up",
+  "source": "C"
+ },
+ {
+  "text": "and why not just put a queue in between.",
+  "label": "yes",
+  "category": "follow_up",
+  "source": "C"
+ },
+ {
+  "text": "Building on what Priya asked, how did you handle schema changes across the services?",
+  "label": "yes",
+  "category": "follow_up",
+  "source": "C"
+ },
+ {
+  "text": "Sorry to jump in before you move on, how did you decide on the shard key?",
+  "label": "yes",
+  "category": "follow_up",
+  "source": "C"
+ },
+ {
+  "text": "So uh, so you said it's eventually consistent, so how do you, how do you make sure the user sees their own writes?",
+  "label": "yes",
+  "category": "follow_up",
+  "source": "C"
+ },
+ {
+  "text": "is that the only approach or can you think of something better than n squared",
+  "label": "yes",
+  "category": "follow_up",
+  "source": "C"
+ },
+ {
+  "text": "So the role is mostly backend, but you'd be expected to pick up some frontend tickets now and then.",
+  "label": "no",
+  "category": "statement",
+  "source": "C"
+ },
+ {
+  "text": "We use a mix of Go and Python, and pretty much everything runs on EKS.",
+  "label": "no",
+  "category": "statement",
+  "source": "C"
+ },
+ {
+  "text": "Honestly that's a very common approach, most candidates go with a hash map there.",
+  "label": "no",
+  "category": "statement",
+  "source": "C"
+ },
+ {
+  "text": "i think the main bottleneck right now is the reporting service its been timing out every monday",
+  "label": "no",
+  "category": "statement",
+  "source": "C"
+ },
+ {
+  "text": "The client has been very clear that they want the dashboard live by end of Q3.",
+  "label": "no",
+  "category": "statement",
+  "source": "C"
+ },
+ {
+  "text": "my last manager used to say the exact same thing actually",
+  "label": "no",
+  "category": "statement",
+  "source": "C"
+ },
+ {
+  "text": "The budget for this position is somewhere between eighteen and twenty-two lakhs fixed, plus variable.",
+  "label": "no",
+  "category": "statement",
+  "source": "C"
+ },
+ {
+  "text": "Yeah we had a similar outage last year, took us like three days to find the root cause, so yeah.",
+  "label": "no",
+  "category": "statement",
+  "source": "C"
+ },
+ {
+  "text": "There will be three more rounds after this one, coding, design, and then the hiring manager?",
+  "label": "no",
+  "category": "statement",
+  "source": "C"
+ },
+ {
+  "text": "I joined this team about two years back, came from a fintech startup before that.",
+  "label": "no",
+  "category": "statement",
+  "source": "C"
+ },
+ {
+  "text": "By the way, I've put your name forward for the tech lead role, so fingers crossed.",
+  "label": "no",
+  "category": "statement",
+  "source": "C"
+ },
+ {
+  "text": "Okay, I'll hand it over to Rahul now, he'll take the technical part.",
+  "label": "no",
+  "category": "announcement",
+  "source": "C"
+ },
+ {
+  "text": "alright I'm pasting the problem statement in the chat now",
+  "label": "no",
+  "category": "announcement",
+  "source": "C"
+ },
+ {
+  "text": "Just a heads up, we are recording this session for internal calibration purposes.",
+  "label": "no",
+  "category": "announcement",
+  "source": "C"
+ },
+ {
+  "text": "My colleague Arjun will be joining us in a few minutes, he's stuck on another call?",
+  "label": "no",
+  "category": "announcement",
+  "source": "C"
+ },
+ {
+  "text": "Let me give you some context on the problem first, and then you can ask clarifying questions.",
+  "label": "no",
+  "category": "announcement",
+  "source": "C"
+ },
+ {
+  "text": "I'll be asking you a few questions on your thesis, and then Professor Menon will take over.",
+  "label": "no",
+  "category": "announcement",
+  "source": "C"
+ },
+ {
+  "text": "So for this sprint the goal is to close out all the checkout bugs before the release on the 14th.",
+  "label": "no",
+  "category": "announcement",
+  "source": "C"
+ },
+ {
+  "text": "Okay, got it.",
+  "label": "no",
+  "category": "acknowledgement",
+  "source": "C"
+ },
+ {
+  "text": "Mm-hmm, makes sense.",
+  "label": "no",
+  "category": "acknowledgement",
+  "source": "C"
+ },
+ {
+  "text": "right yeah that's pretty much what I would've done too",
+  "label": "no",
+  "category": "acknowledgement",
+  "source": "C"
+ },
+ {
+  "text": "Perfect, thank you, that's very clear.",
+  "label": "no",
+  "category": "acknowledgement",
+  "source": "C"
+ },
+ {
+  "text": "okay noted",
+  "label": "no",
+  "category": "acknowledgement",
+  "source": "C"
+ },
+ {
+  "text": "Great, that answers my question.",
+  "label": "no",
+  "category": "acknowledgement",
+  "source": "C"
+ },
+ {
+  "text": "Hmm, interesting?",
+  "label": "no",
+  "category": "acknowledgement",
+  "source": "C"
+ },
+ {
+  "text": "Can you hear me okay?",
+  "label": "no",
+  "category": "logistics",
+  "source": "C"
+ },
+ {
+  "text": "Sorry, I think you're on mute.",
+  "label": "no",
+  "category": "logistics",
+  "source": "C"
+ },
+ {
+  "text": "Your video froze for a second there.",
+  "label": "no",
+  "category": "logistics",
+  "source": "C"
+ },
+ {
+  "text": "Could you share your screen so we can see the editor?",
+  "label": "no",
+  "category": "logistics",
+  "source": "C"
+ },
+ {
+  "text": "Let me just drop the CoderPad link in the chat",
+  "label": "no",
+  "category": "logistics",
+  "source": "C"
+ },
+ {
+  "text": "Rahul, do you want to add anything before we move on?",
+  "label": "no",
+  "category": "logistics",
+  "source": "C"
+ },
+ {
+  "text": "can you see my screen now",
+  "label": "no",
+  "category": "logistics",
+  "source": "C"
+ },
+ {
+  "text": "And why does this matter? Because every hundred milliseconds of latency costs us conversions.",
+  "label": "no",
+  "category": "rhetorical",
+  "source": "C"
+ },
+ {
+  "text": "Who doesn't love a good legacy codebase, right?",
+  "label": "no",
+  "category": "rhetorical",
+  "source": "C"
+ },
+ {
+  "text": "so what did we learn from that incident basically that nobody actually owned the alerts",
+  "label": "no",
+  "category": "rhetorical",
+  "source": "C"
+ },
+ {
+  "text": "I mean, how hard can it be to add one button, right? Famous last words.",
+  "label": "no",
+  "category": "rhetorical",
+  "source": "C"
+ },
+ {
+  "text": "Why would anyone store passwords in plain text in this day and age? Beats me, but here we are.",
+  "label": "no",
+  "category": "rhetorical",
+  "source": "C"
+ },
+ {
+  "text": "What's even the point of a design doc if nobody reads it, you know",
+  "label": "no",
+  "category": "rhetorical",
+  "source": "C"
+ },
+ {
+  "text": "So how do we fix this? Well, the plan is to move all the cron jobs into Airflow first.",
+  "label": "no",
+  "category": "rhetorical",
+  "source": "C"
+ },
+ {
+  "text": "Hey, good morning! Hope you had a nice weekend.",
+  "label": "no",
+  "category": "smalltalk",
+  "source": "C"
+ },
+ {
+  "text": "It's been pouring here in Mumbai all week, the roads are an absolute mess.",
+  "label": "no",
+  "category": "smalltalk",
+  "source": "C"
+ },
+ {
+  "text": "I see the Arsenal poster behind you, brave choice this season.",
+  "label": "no",
+  "category": "smalltalk",
+  "source": "C"
+ },
+ {
+  "text": "anyway lovely chatting with you have a great rest of your day",
+  "label": "no",
+  "category": "smalltalk",
+  "source": "C"
+ },
+ {
+  "text": "Good evening sir, hope you are doing well.",
+  "label": "no",
+  "category": "smalltalk",
+  "source": "C"
+ },
+ {
+  "text": "Hi, how's it going?",
+  "label": "no",
+  "category": "smalltalk",
+  "source": "C"
+ },
+ {
+  "text": "We can come back to the salary discussion in the HR round.",
+  "label": "no",
+  "category": "deferral",
+  "source": "C"
+ },
+ {
+  "text": "lets park that for now we're running a bit short on time",
+  "label": "no",
+  "category": "deferral",
+  "source": "C"
+ },
+ {
+  "text": "Hold that thought, I want to get to the design part first.",
+  "label": "no",
+  "category": "deferral",
+  "source": "C"
+ },
+ {
+  "text": "I'll ask you about your testing strategy later, let's finish the core logic first.",
+  "label": "no",
+  "category": "deferral",
+  "source": "C"
+ },
+ {
+  "text": "Don't worry about the edge cases yet, we'll get there.",
+  "label": "no",
+  "category": "deferral",
+  "source": "C"
+ },
+ {
+  "text": "Let's take the rest of this offline, I'll set up a separate call with the architect.",
+  "label": "no",
+  "category": "deferral",
+  "source": "C"
+ },
+ {
+  "text": "Have a think about how you'd scale it, but we'll discuss that in the next round.",
+  "label": "no",
+  "category": "deferral",
+  "source": "C"
+ },
+ {
+  "text": "So if you were to, um—",
+  "label": "no",
+  "category": "fragment",
+  "source": "C"
+ },
+ {
+  "text": "And what about the",
+  "label": "no",
+  "category": "fragment",
+  "source": "C"
+ },
+ {
+  "text": "Could you tell me how the",
+  "label": "no",
+  "category": "fragment",
+  "source": "C"
+ },
+ {
+  "text": "So the, the thing with the uh",
+  "label": "no",
+  "category": "fragment",
+  "source": "C"
+ },
+ {
+  "text": "Okay so let's say you have a, hmm, no, wait.",
+  "label": "no",
+  "category": "fragment",
+  "source": "C"
+ },
+ {
+  "text": "Why did you, actually never mind.",
+  "label": "no",
+  "category": "fragment",
+  "source": "C"
+ },
+ {
+  "text": "What's your take on",
+  "label": "no",
+  "category": "fragment",
+  "source": "C"
+ },
+ {
+  "text": "I was going to ask, uh, sorry, one sec.",
+  "label": "no",
+  "category": "fragment",
+  "source": "C"
+ },
+ {
+  "text": "Does that make sense?",
+  "label": "either",
+  "category": "ambiguous",
+  "source": "C"
+ },
+ {
+  "text": "So you're comfortable with Docker, then.",
+  "label": "either",
+  "category": "ambiguous",
+  "source": "C"
+ },
+ {
+  "text": "Is it okay if we wrap up five minutes early today?",
+  "label": "either",
+  "category": "ambiguous",
+  "source": "C"
+ },
+ {
+  "text": "Where are you based out of currently?",
+  "label": "either",
+  "category": "ambiguous",
+  "source": "C"
+ },
+ {
+  "text": "Who wants to pick up the auth ticket?",
+  "label": "either",
+  "category": "ambiguous",
+  "source": "C"
+ },
+ {
+  "text": "Any blockers?",
+  "label": "either",
+  "category": "ambiguous",
+  "source": "C"
+ },
+ {
+  "text": "interesting so you didn't use any framework for that",
+  "label": "either",
+  "category": "ambiguous",
+  "source": "C"
+ },
+ {
+  "text": "Okay, so that's the problem. Questions?",
+  "label": "either",
+  "category": "ambiguous",
+  "source": "C"
+ },
+ {
+  "text": "It's basically a sliding window problem, right?",
+  "label": "either",
+  "category": "ambiguous",
+  "source": "C"
+ },
+ {
+  "text": "So how was the long weekend, did you go anywhere?",
+  "label": "either",
+  "category": "ambiguous",
+  "source": "C"
+ },
+ {
+  "text": "How would you value a pre-revenue biotech company with a single drug candidate in phase two trials?",
+  "label": "yes",
+  "category": "direct",
+  "source": "D"
+ },
+ {
+  "text": "walk me through the three financial statements and how they tie together",
+  "label": "yes",
+  "category": "imperative",
+  "source": "D"
+ },
+ {
+  "text": "Talk me through how you'd estimate the number of public EV chargers Ohio will need by 2030.",
+  "label": "yes",
+  "category": "imperative",
+  "source": "D"
+ },
+ {
+  "text": "I'd love to hear how you handled handoffs between the night and day shift nurses on that unit.",
+  "label": "yes",
+  "category": "indirect",
+  "source": "D"
+ },
+ {
+  "text": "So for the frame budget, what's your target on a mid-range Android phone.",
+  "label": "yes",
+  "category": "direct",
+  "source": "D"
+ },
+ {
+  "text": "And the churn number, monthly or annual?",
+  "label": "yes",
+  "category": "elliptical",
+  "source": "D"
+ },
+ {
+  "text": "Say a patient's family disagrees with the care plan the attending put together. How do you approach that conversation?",
+  "label": "yes",
+  "category": "hypothetical",
+  "source": "D"
+ },
+ {
+  "text": "Suppose our biggest account threatens to walk unless we cut the price by thirty percent. What do you do?",
+  "label": "yes",
+  "category": "hypothetical",
+  "source": "D"
+ },
+ {
+  "text": "Why that particular sample size?",
+  "label": "yes",
+  "category": "follow_up",
+  "source": "D"
+ },
+ {
+  "text": "Can you say more about what you meant by leaky features?",
+  "label": "yes",
+  "category": "follow_up",
+  "source": "D"
+ },
+ {
+  "text": "um so like how did you uh decide which features to drop",
+  "label": "yes",
+  "category": "direct",
+  "source": "D"
+ },
+ {
+  "text": "Give me a rough sense of your blended customer acquisition cost.",
+  "label": "yes",
+  "category": "imperative",
+  "source": "D"
+ },
+ {
+  "text": "I'm curious what made you pick Godot over Unity for this one.",
+  "label": "yes",
+  "category": "indirect",
+  "source": "D"
+ },
+ {
+  "text": "Tell me about a time a senior stakeholder pushed back hard on your roadmap.",
+  "label": "yes",
+  "category": "imperative",
+  "source": "D"
+ },
+ {
+  "text": "Your take on whether we should sunset the legacy reporting dashboard?",
+  "label": "yes",
+  "category": "elliptical",
+  "source": "D"
+ },
+ {
+  "text": "What happens to your gross margin if your cloud costs go up twenty percent next year?",
+  "label": "yes",
+  "category": "hypothetical",
+  "source": "D"
+ },
+ {
+  "text": "Could you confirm whether the refund went back to the original card or was issued as store credit?",
+  "label": "yes",
+  "category": "direct",
+  "source": "D"
+ },
+ {
+  "text": "the customer says they got charged twice so can you walk me through what you're seeing on your end",
+  "label": "yes",
+  "category": "imperative",
+  "source": "D"
+ },
+ {
+  "text": "Any concerns with the timeline we just laid out?",
+  "label": "yes",
+  "category": "elliptical",
+  "source": "D"
+ },
+ {
+  "text": "How do you deal with class imbalance when the positive class is like half a percent of the data",
+  "label": "yes",
+  "category": "direct",
+  "source": "D"
+ },
+ {
+  "text": "Explain the difference between a left join and a semi join.",
+  "label": "yes",
+  "category": "imperative",
+  "source": "D"
+ },
+ {
+  "text": "Let's say the load balancer starts returning 502s on ten percent of requests. Where do you start?",
+  "label": "yes",
+  "category": "hypothetical",
+  "source": "D"
+ },
+ {
+  "text": "Remind me, what was the sample population for the second study?",
+  "label": "yes",
+  "category": "follow_up",
+  "source": "D"
+ },
+ {
+  "text": "Do you have any questions for us?",
+  "label": "yes",
+  "category": "direct",
+  "source": "D"
+ },
+ {
+  "text": "Take a minute if you need it, but I'd like you to sketch out the data model for a ride-sharing app.",
+  "label": "yes",
+  "category": "imperative",
+  "source": "D"
+ },
+ {
+  "text": "Who do you see as your closest competitor, and why do you win against them?",
+  "label": "yes",
+  "category": "direct",
+  "source": "D"
+ },
+ {
+  "text": "Okay so, uh, the — the main thing I want to understand is how you'd prioritize these three bugs.",
+  "label": "yes",
+  "category": "indirect",
+  "source": "D"
+ },
+ {
+  "text": "Is there a reason you went with fixed effects rather than random effects",
+  "label": "yes",
+  "category": "direct",
+  "source": "D"
+ },
+ {
+  "text": "What happens if two players pick up the same item on the same server tick?",
+  "label": "yes",
+  "category": "hypothetical",
+  "source": "D"
+ },
+ {
+  "text": "Help me understand why conversion dropped after the checkout redesign.",
+  "label": "yes",
+  "category": "imperative",
+  "source": "D"
+ },
+ {
+  "text": "Before you give me a number, I want to hear your reasoning.",
+  "label": "yes",
+  "category": "follow_up",
+  "source": "D"
+ },
+ {
+  "text": "On a scale of one to ten, rate your SQL.",
+  "label": "yes",
+  "category": "imperative",
+  "source": "D"
+ },
+ {
+  "text": "Would you be open to relocating to Austin?",
+  "label": "yes",
+  "category": "direct",
+  "source": "D"
+ },
+ {
+  "text": "Monthly actives?",
+  "label": "yes",
+  "category": "elliptical",
+  "source": "D"
+ },
+ {
+  "text": "so what's the ask, how much are you raising and at what valuation",
+  "label": "yes",
+  "category": "direct",
+  "source": "D"
+ },
+ {
+  "text": "Sorry, I missed that last bit. How did you get to forty million?",
+  "label": "yes",
+  "category": "follow_up",
+  "source": "D"
+ },
+ {
+  "text": "If you only had two months of runway left, what would you cut first?",
+  "label": "yes",
+  "category": "hypothetical",
+  "source": "D"
+ },
+ {
+  "text": "Walk us through slide eleven, the cohort retention chart.",
+  "label": "yes",
+  "category": "imperative",
+  "source": "D"
+ },
+ {
+  "text": "you know I'm kind of wondering if you considered a survival analysis approach for that",
+  "label": "yes",
+  "category": "indirect",
+  "source": "D"
+ },
+ {
+  "text": "Before you start crunching numbers, lay out how you'd structure this problem.",
+  "label": "yes",
+  "category": "imperative",
+  "source": "D"
+ },
+ {
+  "text": "What are the main drivers you'd look at to figure out why the client's profits are falling?",
+  "label": "yes",
+  "category": "direct",
+  "source": "D"
+ },
+ {
+  "text": "And on the dosing side, how would you adjust for a patient with renal impairment?",
+  "label": "yes",
+  "category": "follow_up",
+  "source": "D"
+ },
+ {
+  "text": "Per seat or usage based?",
+  "label": "yes",
+  "category": "elliptical",
+  "source": "D"
+ },
+ {
+  "text": "I'd be interested to know how your team handles invoice approvals today.",
+  "label": "yes",
+  "category": "indirect",
+  "source": "D"
+ },
+ {
+  "text": "What would you say is the biggest limitation of your methodology?",
+  "label": "yes",
+  "category": "direct",
+  "source": "D"
+ },
+ {
+  "text": "Imagine you join and the release is already three weeks late. First thing you'd do?",
+  "label": "yes",
+  "category": "hypothetical",
+  "source": "D"
+ },
+ {
+  "text": "How confident are you in that estimate.",
+  "label": "yes",
+  "category": "follow_up",
+  "source": "D"
+ },
+ {
+  "text": "Can you justify the discount rate? Eleven percent feels high for a utility.",
+  "label": "yes",
+  "category": "follow_up",
+  "source": "D"
+ },
+ {
+  "text": "uh what's the — what's the difference between precision and recall in plain terms",
+  "label": "yes",
+  "category": "direct",
+  "source": "D"
+ },
+ {
+  "text": "Mind sharing what your day-thirty retention looks like?",
+  "label": "yes",
+  "category": "indirect",
+  "source": "D"
+ },
+ {
+  "text": "Thoughts?",
+  "label": "yes",
+  "category": "elliptical",
+  "source": "D"
+ },
+ {
+  "text": "Pick one of those and go deeper.",
+  "label": "yes",
+  "category": "imperative",
+  "source": "D"
+ },
+ {
+  "text": "so the escalation, what exactly did the customer say when they called back",
+  "label": "yes",
+  "category": "follow_up",
+  "source": "D"
+ },
+ {
+  "text": "If a regulator asked you tomorrow to prove the credit model isn't biased, how would you do it?",
+  "label": "yes",
+  "category": "hypothetical",
+  "source": "D"
+ },
+ {
+  "text": "Tell me more about that.",
+  "label": "yes",
+  "category": "follow_up",
+  "source": "D"
+ },
+ {
+  "text": "yeah so like how would you design the matchmaking system for a five v five game",
+  "label": "yes",
+  "category": "direct",
+  "source": "D"
+ },
+ {
+  "text": "I guess what I'm asking is, does the effect hold if you exclude the outliers.",
+  "label": "yes",
+  "category": "indirect",
+  "source": "D"
+ },
+ {
+  "text": "Quick follow-up on that, was the A/B test powered for a two percent lift or something bigger?",
+  "label": "yes",
+  "category": "follow_up",
+  "source": "D"
+ },
+ {
+  "text": "Could you speak to how you'd handle HIPAA compliance if we stored transcripts in the cloud?",
+  "label": "yes",
+  "category": "indirect",
+  "source": "D"
+ },
+ {
+  "text": "Gimme the elevator pitch, thirty seconds.",
+  "label": "yes",
+  "category": "imperative",
+  "source": "D"
+ },
+ {
+  "text": "We've seen about a twelve percent drop in renewals since Q2.",
+  "label": "no",
+  "category": "statement",
+  "source": "D"
+ },
+ {
+  "text": "The client is a regional bank with about four hundred branches, mostly in the Midwest.",
+  "label": "no",
+  "category": "statement",
+  "source": "D"
+ },
+ {
+  "text": "Our stack is mostly Python with a couple of Go services on the backend?",
+  "label": "no",
+  "category": "statement",
+  "source": "D"
+ },
+ {
+  "text": "I think the housing market's going to cool off a bit next year?",
+  "label": "no",
+  "category": "statement",
+  "source": "D"
+ },
+ {
+  "text": "That's exactly the kind of answer we were hoping for.",
+  "label": "no",
+  "category": "acknowledgement",
+  "source": "D"
+ },
+ {
+  "text": "okay cool cool",
+  "label": "no",
+  "category": "acknowledgement",
+  "source": "D"
+ },
+ {
+  "text": "Interesting, I hadn't thought about it that way.",
+  "label": "no",
+  "category": "acknowledgement",
+  "source": "D"
+ },
+ {
+  "text": "Perfect, thank you so much.",
+  "label": "no",
+  "category": "acknowledgement",
+  "source": "D"
+ },
+ {
+  "text": "Hold on, I think my audio's cutting out.",
+  "label": "no",
+  "category": "logistics",
+  "source": "D"
+ },
+ {
+  "text": "Can everyone see my screen?",
+  "label": "no",
+  "category": "logistics",
+  "source": "D"
+ },
+ {
+  "text": "Sorry, I think you're on mute.",
+  "label": "no",
+  "category": "logistics",
+  "source": "D"
+ },
+ {
+  "text": "Let me just pull up the deck real quick.",
+  "label": "no",
+  "category": "logistics",
+  "source": "D"
+ },
+ {
+  "text": "Priya's going to hop on in about five minutes, she's stuck in another call.",
+  "label": "no",
+  "category": "logistics",
+  "source": "D"
+ },
+ {
+  "text": "Could we push the follow-up to Thursday at two instead?",
+  "label": "no",
+  "category": "logistics",
+  "source": "D"
+ },
+ {
+  "text": "I'm dropping the case exhibit in the chat now.",
+  "label": "no",
+  "category": "logistics",
+  "source": "D"
+ },
+ {
+  "text": "your video froze for a sec there",
+  "label": "no",
+  "category": "logistics",
+  "source": "D"
+ },
+ {
+  "text": "Hi, good morning, thanks so much for making the time.",
+  "label": "no",
+  "category": "smalltalk",
+  "source": "D"
+ },
+ {
+  "text": "How's the weather over there, still snowing?",
+  "label": "no",
+  "category": "smalltalk",
+  "source": "D"
+ },
+ {
+  "text": "How's your week going so far?",
+  "label": "no",
+  "category": "smalltalk",
+  "source": "D"
+ },
+ {
+  "text": "Who doesn't love a good spreadsheet, right?",
+  "label": "no",
+  "category": "rhetorical",
+  "source": "D"
+ },
+ {
+  "text": "Why does this matter? Because every hundred milliseconds of latency costs us about one percent in conversions.",
+  "label": "no",
+  "category": "rhetorical",
+  "source": "D"
+ },
+ {
+  "text": "So what does that tell us? It tells us the March cohort was an outlier.",
+  "label": "no",
+  "category": "rhetorical",
+  "source": "D"
+ },
+ {
+  "text": "I mean how hard can it be to ship a hotfix, right",
+  "label": "no",
+  "category": "rhetorical",
+  "source": "D"
+ },
+ {
+  "text": "Let me check with the hiring manager and get back to you on that.",
+  "label": "no",
+  "category": "deferral",
+  "source": "D"
+ },
+ {
+  "text": "We'll get into compensation in the next round.",
+  "label": "no",
+  "category": "deferral",
+  "source": "D"
+ },
+ {
+  "text": "Great question, I'll have to follow up with you after the call.",
+  "label": "no",
+  "category": "deferral",
+  "source": "D"
+ },
+ {
+  "text": "Let's park that for now and come back to it if we have time.",
+  "label": "no",
+  "category": "deferral",
+  "source": "D"
+ },
+ {
+  "text": "So the way I'd",
+  "label": "no",
+  "category": "fragment",
+  "source": "D"
+ },
+ {
+  "text": "and then what we ended up doing was um",
+  "label": "no",
+  "category": "fragment",
+  "source": "D"
+ },
+ {
+  "text": "So if you look at the",
+  "label": "no",
+  "category": "fragment",
+  "source": "D"
+ },
+ {
+  "text": "Can you",
+  "label": "no",
+  "category": "fragment",
+  "source": "D"
+ },
+ {
+  "text": "Today we'll do about thirty minutes on the case and then leave fifteen for your questions.",
+  "label": "no",
+  "category": "announcement",
+  "source": "D"
+ },
+ {
+  "text": "Just to set expectations, this round is mostly behavioral.",
+  "label": "no",
+  "category": "announcement",
+  "source": "D"
+ },
+ {
+  "text": "Alright, let's move on to the technical portion.",
+  "label": "no",
+  "category": "announcement",
+  "source": "D"
+ },
+ {
+  "text": "We went with Postgres mostly because the team already knew it well.",
+  "label": "no",
+  "category": "statement",
+  "source": "D"
+ },
+ {
+  "text": "The committee usually gives you about twenty minutes to present before they start asking questions.",
+  "label": "no",
+  "category": "announcement",
+  "source": "D"
+ },
+ {
+  "text": "yeah no that totally tracks",
+  "label": "no",
+  "category": "acknowledgement",
+  "source": "D"
+ },
+ {
+  "text": "The customer has escalated this twice already and they're pretty frustrated.",
+  "label": "no",
+  "category": "statement",
+  "source": "D"
+ },
+ {
+  "text": "so yeah that's basically the whole pipeline",
+  "label": "no",
+  "category": "statement",
+  "source": "D"
+ },
+ {
+  "text": "Honestly I was wondering the same thing when I first joined.",
+  "label": "no",
+  "category": "statement",
+  "source": "D"
+ },
+ {
+  "text": "Tell you what, I'll send over data room access right after this.",
+  "label": "no",
+  "category": "announcement",
+  "source": "D"
+ },
+ {
+  "text": "um I think we're actually at time",
+  "label": "no",
+  "category": "logistics",
+  "source": "D"
+ },
+ {
+  "text": "Is it just me or is there a really bad echo?",
+  "label": "no",
+  "category": "logistics",
+  "source": "D"
+ },
+ {
+  "text": "Who would've thought a rounding error could cost us half a million dollars?",
+  "label": "no",
+  "category": "rhetorical",
+  "source": "D"
+ },
+ {
+  "text": "My old manager used to say explain it like I'm five, and that stuck with me.",
+  "label": "no",
+  "category": "statement",
+  "source": "D"
+ },
+ {
+  "text": "Could you share your screen?",
+  "label": "no",
+  "category": "logistics",
+  "source": "D"
+ },
+ {
+  "text": "So I spent about six years at Deloitte before moving into the startup world?",
+  "label": "no",
+  "category": "statement",
+  "source": "D"
+ },
+ {
+  "text": "Uh, sorry, my dog is — give me one second.",
+  "label": "no",
+  "category": "logistics",
+  "source": "D"
+ },
+ {
+  "text": "the quarterly numbers came in a bit under forecast mostly because of FX headwinds",
+  "label": "no",
+  "category": "statement",
+  "source": "D"
+ },
+ {
+  "text": "Hmm, let me think about how to phrase this next one.",
+  "label": "no",
+  "category": "deferral",
+  "source": "D"
+ },
+ {
+  "text": "Any questions so far?",
+  "label": "either",
+  "category": "ambiguous",
+  "source": "D"
+ },
+ {
+  "text": "make sense",
+  "label": "either",
+  "category": "ambiguous",
+  "source": "D"
+ },
+ {
+  "text": "So you're saying the model was retrained weekly",
+  "label": "either",
+  "category": "ambiguous",
+  "source": "D"
+ },
+ {
+  "text": "The question I always ask is how people deal with ambiguity, and honestly most candidates stumble.",
+  "label": "either",
+  "category": "ambiguous",
+  "source": "D"
+ },
+ {
+  "text": "Right?",
+  "label": "either",
+  "category": "ambiguous",
+  "source": "D"
+ },
+ {
+  "text": "You've worked with Kafka before.",
+  "label": "either",
+  "category": "ambiguous",
+  "source": "D"
+ },
+ {
+  "text": "And the margins on that product line",
+  "label": "either",
+  "category": "ambiguous",
+  "source": "D"
+ },
+ {
+  "text": "I'm not sure the numbers add up here.",
+  "label": "either",
+  "category": "ambiguous",
+  "source": "D"
+ },
+ {
+  "text": "Fair enough, though I'd push back a bit on that assumption.",
+  "label": "either",
+  "category": "ambiguous",
+  "source": "D"
+ },
+ {
+  "text": "so the patient came in with chest pain and a, uh, elevated troponin?",
+  "label": "either",
+  "category": "ambiguous",
+  "source": "D"
+ }
+]

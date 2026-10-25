@@ -1,0 +1,35 @@
+{
+  "name": "meeting-copilot",
+  "private": true,
+  "version": "0.1.0",
+  "description": "Real-time AI meeting copilot: Chrome extension (MV3) + local Node server",
+  "type": "module",
+  "workspaces": [
+    "shared",
+    "server",
+    "extension"
+  ],
+  "scripts": {
+    "dev:server": "npm run dev -w server",
+    "dev:extension": "npm run dev -w extension",
+    "build": "npm run build -w server && npm run build -w extension",
+    "start": "npm run start -w server",
+    "typecheck": "npm run typecheck -w shared && npm run typecheck -w server && npm run typecheck -w extension",
+    "lint": "eslint .",
+    "test": "vitest run",
+    "validate:manifest": "npm run validate -w extension",
+    "check": "npm run typecheck && npm run lint && npm run test && npm run build && npm run validate:manifest && npm run smoke -w server"
+  },
+  "engines": {
+    "node": ">=22.13"
+  },
+  "devDependencies": {
+    "@eslint/js": "^10.0.1",
+    "eslint": "^10.13.0",
+    "eslint-plugin-react-hooks": "^7.1.1",
+    "globals": "^17.13.0",
+    "typescript": "^6.0.3",
+    "typescript-eslint": "^8.72.0",
+    "vitest": "^5.0.5"
+  }
+}

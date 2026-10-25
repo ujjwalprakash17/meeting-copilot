@@ -1,0 +1,18 @@
+{
+  "description": "Synthetic two-speaker interview generated locally with Windows text-to-speech (no real person's voice). Used to measure transcription accuracy, speaker attribution and latency against the real Deepgram API. gapMs is the silence before the line; a negative gap overlaps the previous line.",
+  "voices": { "A": "Microsoft Zira Desktop", "B": "Microsoft Hazel Desktop" },
+  "lines": [
+    { "speaker": "A", "gapMs": 500, "text": "Hi, thanks for joining us today. Can you hear me clearly?" },
+    { "speaker": "B", "gapMs": 600, "text": "Yes, I can hear you fine." },
+    { "speaker": "A", "gapMs": 700, "text": "Great. Let's start with something technical. What is the difference between a process and a thread?" },
+    { "speaker": "B", "gapMs": 900, "text": "A process has its own memory space, while threads share memory inside a single process." },
+    { "speaker": "A", "gapMs": 400, "text": "Okay." },
+    { "speaker": "A", "gapMs": 300, "text": "And how would you design a rate limiter for a public API?" },
+    { "speaker": "B", "gapMs": 150, "text": "I would use a token bucket for each client and keep the counters in Redis." },
+    { "speaker": "A", "gapMs": -400, "text": "Sure." },
+    { "speaker": "B", "gapMs": 500, "text": "Should I go into more detail about the trade offs?" },
+    { "speaker": "A", "gapMs": 600, "text": "No, that's fine. Tell me about a project where you handled a large transaction volume." },
+    { "speaker": "B", "gapMs": 800, "text": "At my last company I built a payment service that handled millions of transactions every day." },
+    { "speaker": "A", "gapMs": 700, "text": "Thank you, that's all from my side." }
+  ]
+}

@@ -1,0 +1,12 @@
+node_modules/
+dist/
+.env
+*.log
+coverage/
+
+# Local conversation history database (never commit)
+server/data/
+*.sqlite
+*.sqlite-wal
+*.sqlite-shm
+server/bench/samples/

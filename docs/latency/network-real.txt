@@ -1,0 +1,24 @@
+
+> @meeting-copilot/server@0.1.0 bench:network
+> tsx bench/network.ts
+
+Real network measurement from this machine (2026-10-22T17:22:07.272Z), key: invalid (401 responses)
+
+Node default fetch pool
+  first request (cold)       559 ms  (HTTP 401)
+  immediate repeat 1         443 ms  (HTTP 401)
+  immediate repeat 2         299 ms  (HTTP 401)
+  immediate repeat 3         288 ms  (HTTP 401)
+  after 6 s idle             529 ms  (HTTP 401)
+  after 30 s idle            413 ms  (HTTP 401)
+
+Keep-alive agent (keepAliveTimeout 60 s)
+  first request (cold)       450 ms  (HTTP 401)
+  immediate repeat 1         328 ms  (HTTP 401)
+  immediate repeat 2         310 ms  (HTTP 401)
+  immediate repeat 3         324 ms  (HTTP 401)
+  after 6 s idle             308 ms  (HTTP 401)
+  after 30 s idle            300 ms  (HTTP 401)
+
+Deepgram WebSocket handshake (401 with invalid key): 1113, 1185, 920 ms
+{"defaultRows":[{"step":"first request (cold)","ms":559,"status":401},{"step":"immediate repeat 1","ms":443,"status":401},{"step":"immediate repeat 2","ms":299,"status":401},{"step":"immediate repeat 3","ms":288,"status":401},{"step":"after 6 s idle","ms":529,"status":401},{"step":"after 30 s idle","ms":413,"status":401}],"agentRows":[{"step":"first request (cold)","ms":450,"status":401},{"step":"immediate repeat 1","ms":328,"status":401},{"step":"immediate repeat 2","ms":310,"status":401},{"step":"immediate repeat 3","ms":324,"status":401},{"step":"after 6 s idle","ms":308,"status":401},{"step":"after 30 s idle","ms":300,"status":401}],"deepgramHandshakeMs":[1113,1185,920]}

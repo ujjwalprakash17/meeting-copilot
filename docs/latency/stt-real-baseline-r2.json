@@ -1,0 +1,65 @@
+{
+  "label": "baseline-r2",
+  "generatedAt": "2026-10-22T18:57:51.751Z",
+  "provider": "deepgram (real API)",
+  "model": "nova-3",
+  "diarize": true,
+  "url": "wss://api.deepgram.com/v1/listen?model=nova-3&language=en&encoding=linear16&sample_rate=16000&channels=1&interim_results=true&punctuate=true&smart_format=true&endpointing=300&utterance_end_ms=1000&vad_events=true&diarize=true",
+  "audioSeconds": 62,
+  "wer": {
+    "wer": 0,
+    "errors": 0,
+    "words": 125
+  },
+  "segments": 19,
+  "segmentsMixingTwoReferenceSpeakers": 0,
+  "parserAttribution": {
+    "wordsScored": 124,
+    "wordsLabelled": 124,
+    "accuracy": 0.895,
+    "distinctLabels": 2
+  },
+  "deepgramWordAttribution": {
+    "wordsScored": 124,
+    "wordsLabelled": 124,
+    "accuracy": 0.895,
+    "distinctLabels": 2
+  },
+  "lagAfterLineEndMs": {
+    "firstTranscript": {
+      "n": 12,
+      "p50": 0,
+      "p95": 250,
+      "min": 0,
+      "max": 250
+    },
+    "final": {
+      "n": 12,
+      "p50": 184,
+      "p95": 313,
+      "min": 106,
+      "max": 313
+    }
+  },
+  "transcript": [
+    "[S1] Hi, thanks for joining us today.",
+    "[S1] Can you hear me clearly?",
+    "[S1] Yes, I can hear you fine.",
+    "[S1] Great.",
+    "[S1] Let's start with something technical.",
+    "[S1] What is the difference between a process and a thread?",
+    "[S1] A process has its own memory space,",
+    "[S2] while threads share memory inside a single process.",
+    "[S1] Okay.",
+    "[S1] And how would you design a rate limiter for a public API?",
+    "[S2] I would use a token bucket for each client and keep",
+    "[S2] the counters in Redis.",
+    "[S1] Sure.",
+    "[S2] Should I go into more detail about the trade offs?",
+    "[S1] No, that's fine.",
+    "[S1] Tell me about a project where you handled a large transaction volume.",
+    "[S2] At my last company I built a payment",
+    "[S2] service that handled millions of transactions every day.",
+    "[S1] Thank you. That's all from my side."
+  ]
+}
