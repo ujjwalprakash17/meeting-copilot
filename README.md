@@ -122,10 +122,12 @@ npm install
 cp .env.example server/.env          # Windows PowerShell: Copy-Item .env.example server/.env
 # edit server/.env: set DEEPGRAM_API_KEY and GROQ_API_KEY
 
-# Start the local server (auto-reload)
+# One command for a meeting: builds the server and extension, then starts the server (no auto-reload).
+# After it starts, reload the extension once in chrome://extensions if the code changed.
+npm start
+# ...or during development, the auto-reloading server:
 npm run dev:server
-# ...or production build:
-npm run build -w server && npm start
+# start-copilot.cmd (double-click) does the same as npm start, plus a live check of both API keys first.
 
 # Build the extension (outputs extension/dist)
 npm run build -w extension
