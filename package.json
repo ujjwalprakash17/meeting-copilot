@@ -13,7 +13,7 @@
     "dev:server": "npm run dev -w server",
     "dev:extension": "npm run dev -w extension",
     "build": "npm run build -w server && npm run build -w extension",
-    "start": "npm run start -w server",
+    "start": "npm run build && npm run start -w server",
     "typecheck": "npm run typecheck -w shared && npm run typecheck -w server && npm run typecheck -w extension",
     "lint": "eslint .",
     "test": "vitest run",

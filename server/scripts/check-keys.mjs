@@ -7,7 +7,7 @@ import { performance } from 'node:perf_hooks';
 import { buildAnswerMessages, MAX_TOKENS_BY_LENGTH } from '../src/answers/promptBuilder.js';
 import { loadConfig } from '../src/config.js';
 import { GroqProvider } from '../src/llm/groq.js';
-import { CLASSIFIER_PROMPT } from '../src/session/Session.js';
+import { classifierMessages } from '../src/detection/classifier.js';
 import { DeepgramProvider } from '../src/transcription/deepgram.js';
 
 const config = loadConfig();
@@ -82,11 +82,9 @@ async function checkGroq() {
     const t0 = performance.now();
     try {
       const result = await provider.classifyJson({
-        messages: [
-          { role: 'system', content: CLASSIFIER_PROMPT },
-          { role: 'user', content: JSON.stringify({ preceding: '', utterance: "I'd love to hear how you would approach caching for the product catalog" }) },
-        ],
-        maxTokens: 30,
+        // Same request shape and budget as a live session (Session.confirmAmbiguous).
+        messages: classifierMessages({ utterance: "I'd love to hear how you would approach caching for the product catalog", recent: [] }),
+        maxTokens: 60,
         signal: controller.signal,
       });
       const ms = Math.round(performance.now() - t0);
