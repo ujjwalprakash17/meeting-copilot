@@ -6,6 +6,7 @@
  * Logs (see lib/log.ts): chrome://extensions -> Meeting Copilot -> "service worker" -> Console.
  */
 import { elapsedMs, monotonicNow, type CopilotState } from '@meeting-copilot/shared';
+import { actionAppearance, actionIconPaths } from '../lib/actionAppearance.js';
 import { openAssistantWindow, type StoredWindowInfo } from '../lib/assistantWindow.js';
 import { chooseAssistantPlacement, type DisplayLike, type Rect } from '../lib/displayPlacement.js';
 import { initContextLogging, isDebugLogging } from '../lib/log.js';
@@ -60,19 +61,18 @@ async function closeOffscreen(): Promise<void> {
 // Status indicator (toolbar badge): visible outside the meeting page.
 // ---------------------------------------------------------------------------
 
+/** Toolbar icon: grey when not listening, soft blue while listening; "ERR" badge on errors (see actionAppearance). */
 async function applyBadge(status: SessionStatus): Promise<void> {
-  const active = status.phase === 'live' || status.phase === 'starting' || status.phase === 'reconnecting';
-  const text =
-    status.phase === 'error' ? 'ERR' : !active ? '' : status.mode === 'simulation' ? 'SIM' : status.phase === 'reconnecting' ? '…' : 'REC';
-  await chrome.action.setBadgeText({ text });
-  await chrome.action.setBadgeBackgroundColor({ color: status.phase === 'error' ? '#b45309' : status.mode === 'simulation' ? '#6d28d9' : '#dc2626' });
-  await chrome.action.setTitle({
-    title: active
-      ? `Meeting Copilot: ${status.mode === 'simulation' ? 'simulation (test mode)' : `listening to "${status.tabTitle ?? 'tab'}"`}`
-      : status.phase === 'error'
-        ? `Meeting Copilot: ${status.message ?? 'error'}`
-        : 'Meeting Copilot',
-  });
+  const look = actionAppearance(status);
+  try {
+    await chrome.action.setIcon({ path: actionIconPaths(look.icon) });
+    await chrome.action.setBadgeText({ text: look.badgeText });
+    await chrome.action.setBadgeBackgroundColor({ color: look.badgeColor });
+    await chrome.action.setTitle({ title: look.title });
+  } catch (err) {
+    // Cosmetic only: never let the toolbar icon block starting or stopping a session.
+    log.warn('toolbar_icon_update_failed', { icon: look.icon, err, recovery: 'session_continues' });
+  }
 }
 
 async function updateStatus(status: SessionStatus): Promise<void> {

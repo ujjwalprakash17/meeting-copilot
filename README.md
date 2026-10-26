@@ -188,7 +188,14 @@ Model choice: Groq retired `llama-3.3-70b-versatile` and `llama-3.1-8b-instant` 
 1. Run `npm run build -w extension`.
 2. Open `chrome://extensions`, enable **Developer mode**, click **Load unpacked**, choose `meeting-copilot/extension/dist`.
 3. Optional: copy the extension ID shown there into `ALLOWED_EXTENSION_IDS` in `server/.env` and restart the server.
-4. Pin the extension so its badge (REC / SIM / ERR) stays visible.
+4. Pin the extension so its toolbar icon stays visible. The icon is grey when not listening, soft blue while listening (live or simulation), and shows a small **ERR** badge after an error.
+
+   To change the icons, edit the colours in `extension/scripts/generate-icons.mjs` and run `npm run icons -w extension`, or replace the PNGs in `extension/public/icons/` directly, keeping the same file names:
+   - `icon*.png` — the extensions page and store icon
+   - `idle*.png` — toolbar, not listening
+   - `active*.png` — toolbar, listening
+
+   Then run `npm run build -w extension` and click reload on the extension in `chrome://extensions`.
 
 Permissions requested: `tabCapture`, `offscreen`, `storage` and `activeTab`. There are no host permissions and **no content scripts**. The extension never injects anything into Meet or Teams pages, and `npm run validate:manifest` fails if a content script is ever added.
 
@@ -201,7 +208,7 @@ Permissions requested: `tabCapture`, `offscreen`, `storage` and `activeTab`. The
 1. Open your Meet or Teams meeting tab, or the [local audio test page](#local-audio-test-page).
 2. Click the Meeting Copilot toolbar icon **on that tab** and press **Start listening**. Chrome only allows capturing a tab the user has invoked the extension on.
    - Shortcut: **Alt+Shift+Y** toggles listening on the current tab.
-3. The assistant window opens unfocused (keyboard focus stays in the meeting). The badge shows **REC**.
+3. The assistant window opens unfocused (keyboard focus stays in the meeting). The toolbar icon turns from grey to blue.
 4. **Stop**: use the popup, the assistant's Stop button, or Alt+Shift+Y. Stopping stops the media tracks, closes the AudioContext and WebSocket, flushes the transcriber and closes the offscreen document. Closing the captured tab also stops the session.
 
 Capture is bound to the tab you started on, not "whatever tab is active". Switching tabs or windows does not change or stop the capture.
@@ -762,7 +769,7 @@ Use the manual procedures above for these.
 ## Privacy and security
 
 - **Keys:** provider API keys live only in the server's environment and are never sent to or bundled in the extension.
-- **Explicit start:** capture starts only on an explicit user action on that tab. A badge (REC/SIM) and the assistant header show when it is active. Stop releases every resource.
+- **Explicit start:** capture starts only on an explicit user action on that tab. While it is active, the toolbar icon turns blue, Chrome shows its own capture indicator on the tab, and the assistant header shows the state. Stop releases every resource.
 - **No persistent audio:** audio is streamed, never written to disk. Deepgram receives the audio. Groq receives the question, the configured number of recent transcript lines, matching resume and notes excerpts, the previous Q&A for follow-ups, and your style settings. Every card shows what was sent.
 - **Third parties:** review Deepgram's and Groq's current privacy policies and data-retention terms on their websites. Text sent to Groq is processed by an external provider.
 - **Local data:**
