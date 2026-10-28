@@ -17,6 +17,8 @@ export interface PromptInputs {
   resumeExcerpts: RetrievedChunk[];
   noteExcerpts: RetrievedChunk[];
   previousQa?: { question: string; answer: string };
+  /** Summary of the meeting so far (active topic, current requirements); omitted when there is none. */
+  conversationContext?: string;
 }
 
 const STYLE: Record<AnswerStyle, string> = {
@@ -46,7 +48,7 @@ function formatTime(ms: number): string {
   return `${Math.floor(s / 60)}:${String(s % 60).padStart(2, '0')}`;
 }
 
-const escapeData = (text: string) => text.replace(/<\/?(?:transcript|resume_excerpts|notes_excerpts|previous_qa|question|excerpt)[^>]*>/gi, '');
+const escapeData = (text: string) => text.replace(/<\/?(?:transcript|resume_excerpts|notes_excerpts|previous_qa|conversation_context|question|excerpt)[^>]*>/gi, '');
 
 export function buildAnswerMessages(input: PromptInputs): { messages: LlmMessage[]; promptChars: number } {
   const parts: string[] = [];
@@ -62,6 +64,8 @@ export function buildAnswerMessages(input: PromptInputs): { messages: LlmMessage
       `<previous_qa>\nQ: ${escapeData(input.previousQa.question)}\nSuggested answer: ${escapeData(input.previousQa.answer.slice(0, 800))}\n</previous_qa>`,
     );
   }
+  // Order: exact recent transcript, previous Q&A, then the topic summary, then resume/notes excerpts.
+  if (input.conversationContext) parts.push(`<conversation_context>\n${escapeData(input.conversationContext)}\n</conversation_context>`);
   if (input.resumeExcerpts.length) {
     const ex = input.resumeExcerpts.map((c) => `<excerpt section="${c.section}" source="${c.source}">\n${escapeData(c.text)}\n</excerpt>`);
     parts.push(`<resume_excerpts>\n${ex.join('\n')}\n</resume_excerpts>`);

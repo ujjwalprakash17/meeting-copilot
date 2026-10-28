@@ -1,0 +1,71 @@
+[
+  {
+    "name": "URL shortener: follow-up continuity",
+    "turns": [
+      { "text": "Design a URL shortener.", "kind": "question", "topic": "T1" },
+      { "text": "We need to support 10 million requests per day.", "kind": "statement", "topic": "T1" },
+      { "text": "Custom aliases should be supported.", "kind": "statement", "topic": "T1" },
+      { "text": "How would you scale it?", "kind": "question", "topic": "T1", "current": ["10 million requests per day"] },
+      { "text": "What if the cache fails?", "kind": "question", "topic": "T1", "current": ["10 million requests per day"] },
+      { "text": "How would you prevent duplicate aliases?", "kind": "question", "topic": "T1", "current": ["10 million requests per day"] },
+      { "text": "What would you use for caching?", "kind": "question", "topic": "T1", "current": ["10 million requests per day"] }
+    ]
+  },
+  {
+    "name": "Topic transition and return",
+    "turns": [
+      { "text": "Design a URL shortener.", "kind": "question", "topic": "T1" },
+      { "text": "Assume 5,000 writes per second.", "kind": "statement", "topic": "T1" },
+      { "text": "What about the data model?", "kind": "question", "topic": "T1", "current": ["5,000 writes per second"] },
+      { "text": "Let's leave system design for now. Explain database indexing.", "kind": "question", "topic": "T2" },
+      { "text": "When would a composite index help?", "kind": "question", "topic": "T2", "absent": ["5,000 writes per second", "URL shortener"] },
+      { "text": "How do indexes slow down writes?", "kind": "question", "topic": "T2", "absent": ["5,000 writes per second"] },
+      { "text": "Going back to the original design, what about caching?", "kind": "question", "topic": "T1", "current": ["5,000 writes per second"] }
+    ]
+  },
+  {
+    "name": "Requirement changes supersede decisions",
+    "turns": [
+      { "text": "Let's design a ride-hailing backend.", "kind": "statement", "topic": "T1" },
+      { "text": "Start with about 1,000 requests per day.", "kind": "statement", "topic": "T1" },
+      { "text": "Use PostgreSQL for storage.", "kind": "statement", "topic": "T1" },
+      { "text": "Where would you store trip history?", "kind": "question", "topic": "T1", "current": ["1,000 requests per day", "PostgreSQL for storage"] },
+      { "text": "Actually, it needs to handle 50 million requests per day across multiple regions.", "kind": "statement", "topic": "T1" },
+      { "text": "Use DynamoDB instead of PostgreSQL.", "kind": "statement", "topic": "T1" },
+      { "text": "How does that change the architecture?", "kind": "question", "topic": "T1", "current": ["50 million requests per day", "DynamoDB instead of PostgreSQL"], "notCurrent": ["1,000 requests per day", "PostgreSQL for storage"] }
+    ]
+  },
+  {
+    "name": "Resume project, vague follow-up, then design",
+    "turns": [
+      { "text": "Tell me about the payment project on your resume.", "kind": "question", "topic": "T1" },
+      { "text": "What exactly was your contribution?", "kind": "question", "topic": "T1" },
+      { "text": "What would you do differently?", "kind": "question", "topic": "T1" },
+      { "text": "Okay, now design a chat application.", "kind": "question", "topic": "T2", "absent": ["payment project"] },
+      { "text": "It should support group chats with up to 500 members.", "kind": "statement", "topic": "T2" },
+      { "text": "How would you store messages?", "kind": "question", "topic": "T2", "current": ["500 members"], "absent": ["payment project"] }
+    ]
+  },
+  {
+    "name": "Rapid-fire technical questions",
+    "turns": [
+      { "text": "What is a closure in JavaScript?", "kind": "question", "topic": "T1" },
+      { "text": "What is the difference between TCP and UDP?", "kind": "question", "topic": "T2", "absent": ["closure"] },
+      { "text": "Why is UDP faster?", "kind": "question", "topic": "T2" },
+      { "text": "Explain the CAP theorem.", "kind": "question", "topic": "T3", "absent": ["UDP"] },
+      { "text": "Which two would you pick for a banking system?", "kind": "question", "topic": "T3" }
+    ]
+  },
+  {
+    "name": "Design with small talk and an extension request",
+    "turns": [
+      { "text": "Design a notification service.", "kind": "question", "topic": "T1" },
+      { "text": "It must deliver push, email and SMS for 20 million users.", "kind": "statement", "topic": "T1" },
+      { "text": "Sorry, my dog is barking in the background.", "kind": "statement", "topic": "none" },
+      { "text": "We have about ten minutes left.", "kind": "statement", "topic": "none" },
+      { "text": "How would you handle retries?", "kind": "question", "topic": "T1", "current": ["20 million users"], "absent": ["dog is barking", "ten minutes left"] },
+      { "text": "Now add rate limiting.", "kind": "question", "topic": "T1", "current": ["20 million users"] },
+      { "text": "What are the trade-offs?", "kind": "question", "topic": "T1", "current": ["20 million users"] }
+    ]
+  }
+]

@@ -16,7 +16,8 @@
     "bench:groq": "tsx bench/groq.ts",
     "bench:stt": "tsx bench/stt.ts",
     "bench:e2e": "tsx bench/e2e-real.ts",
-    "bench:detection": "tsx bench/detection.ts"
+    "bench:detection": "tsx bench/detection.ts",
+    "bench:context": "tsx bench/context.ts"
   },
   "dependencies": {
     "@meeting-copilot/shared": "*",

@@ -28,10 +28,12 @@ import {
 import { AnswerService } from '../answers/AnswerService.js';
 import { buildAnswerMessages, insufficientEvidenceMessage, MAX_TOKENS_BY_LENGTH } from '../answers/promptBuilder.js';
 import { DEFAULT_LATENCY, type ServerConfig } from '../config.js';
+import { namesOwnSubject, type AnswerContext, type ConversationMemory, type MemoryStore, type QuestionInfo } from '../context/ConversationMemory.js';
+import { DESIGN_EXTENSION, SCOPE_INSTRUCTION, designRequestTitle } from '../context/extract.js';
 import { classifierMessages, parseClassifierVerdict, type ClassifierVerdict } from '../detection/classifier.js';
 import { classifyQuestionIntent } from '../detection/intent.js';
 import { QuestionDetector, type QuestionCandidate, type UtteranceEvaluation } from '../detection/QuestionDetector.js';
-import { startsLikeQuestion } from '../detection/scoring.js';
+import { QUESTION_THRESHOLD, scoreSentence, splitSentences, startsLikeQuestion } from '../detection/scoring.js';
 import { confirmsSpeculation, DEFAULT_SPECULATION, shouldSpeculate } from '../detection/speculation.js';
 import { ConversationRecorder } from '../history/ConversationRecorder.js';
 import type { HistoryWriter } from '../history/HistoryWriter.js';
@@ -39,7 +41,7 @@ import { latencyTracker, type LatencyTracker, type TraceKind } from '../latency/
 import { TextAvailability } from '../latency/TextAvailability.js';
 import type { LlmProvider } from '../llm/types.js';
 import { log as rootLog, logTranscript } from '../logger.js';
-import { KeywordRetriever } from '../resume/retrieval.js';
+import { KeywordRetriever, type RetrievalResult } from '../resume/retrieval.js';
 import { parseResume } from '../resume/sections.js';
 import { TranscriptBuffer } from '../transcript/TranscriptBuffer.js';
 import { SpeakerRegistry } from '../transcription/SpeakerRegistry.js';
@@ -53,6 +55,8 @@ export interface SessionDeps {
   /** Conversation history writer; omitted/null = history disabled. */
   history?: HistoryWriter | null;
   tracker?: LatencyTracker;
+  /** Conversation memory shared across connections (reconnects); omitted/null = context memory off. */
+  memory?: MemoryStore | null;
 }
 
 /** Real-time audio is 32 KB/s; allow bursts (reconnect flushes) but reject floods. */
@@ -99,6 +103,8 @@ export class Session {
   private speakers = new SpeakerRegistry();
   private speakerNumberingRestarted = false;
   private spec: Speculation | null = null;
+  /** Context memory of this extension session (resumed after a reconnect); null when off. */
+  private memory: ConversationMemory | null = null;
   private specCountThisUtterance = 0;
   private candidateThisFlush = false;
   private readonly recorder: ConversationRecorder | null;
@@ -143,7 +149,10 @@ export class Session {
         debounceMs: deps.config.detection.debounceMs,
         dedupeWindowMs: deps.config.detection.dedupeWindowMs,
         onUtteranceFlushed: () => this.onUtteranceFlushed(),
-        onEvaluated: (e) => this.logEvaluation(e),
+        onEvaluated: (e) => {
+          this.observeForContext(e);
+          this.logEvaluation(e);
+        },
       },
       (c) => {
         // Resolve the latency reference now (observations are reset right after this callback);
@@ -244,6 +253,17 @@ export class Session {
     // Correlate with the extension's logs: it logs the same sid.
     this.log = this.log.with({ sid: sessionId });
     this.answers.setLogger(this.log);
+    if (this.deps.memory) {
+      try {
+        // Same extension session after a reconnect (continuation): keep the context. Otherwise start empty.
+        const { memory, resumed } = this.deps.memory.acquire(sessionId, Boolean(continuation));
+        this.memory = memory;
+        this.log.debug('context_ready', { resumed, topics: memory.topicCount });
+      } catch (err) {
+        this.memory = null;
+        this.log.warn('context_update_failed', { stage: 'acquire', err, recovery: 'answers_without_context' });
+      }
+    }
     this.audio = { frames: 0, bytes: 0, dropped: 0, invalid: 0, startedAt: monotonicNow() };
     this.audioSummaryTimer = setInterval(() => this.logAudioSummary('debug'), 60_000);
     this.audioSummaryTimer.unref?.();
@@ -356,6 +376,76 @@ export class Session {
     });
   }
 
+  /**
+   * Feeds a finished utterance (final transcript only, after duplicate filtering) to the context memory:
+   * statements become facts on the active topic before this utterance's question is answered. A design task set
+   * as a statement ("Today let's design a ride-sharing service.") and, while a design is being discussed, an
+   * instruction that extends it ("Now add authentication.") are answered as requests.
+   */
+  private observeForContext(e: UtteranceEvaluation): void {
+    const memory = this.memory;
+    if (!memory) return;
+    try {
+      const text = this.detector.latestUtterance()?.text ?? '';
+      const statements = splitSentences(text).filter((s) => scoreSentence(s).score < QUESTION_THRESHOLD || SCOPE_INSTRUCTION.test(s));
+      const changed = memory.observeStatements(statements);
+      if (changed > 0) this.log.debug('context_updated', { source: 'statement', facts_changed: changed, topic: memory.activeTopic?.kind });
+      const request =
+        e.decision !== 'rejected' || this.detector.isDuplicate(text)
+          ? null
+          : designRequestTitle(text)
+            ? 'design_task'
+            : memory.activeTopic?.kind === 'system_design' && DESIGN_EXTENSION.test(text.trim())
+              ? 'design_extension'
+              : null;
+      if (request) {
+        const segmentIds = this.detector.latestUtterance()?.segmentIds ?? [];
+        const candidate: QuestionCandidate = {
+          text: text.trim(),
+          segmentIds,
+          score: QUESTION_THRESHOLD,
+          confidence: 0.5,
+          ambiguous: false,
+          isFollowUp: request === 'design_extension',
+          intentType: 'imperative_request',
+          requiresContext: request === 'design_extension',
+          reasons: [request === 'design_task' ? 'sets a design task' : 'extends the design under discussion'],
+        };
+        this.detector.remember(candidate.text);
+        this.candidateThisFlush = true;
+        this.log.debug('context_promoted_request', { kind: request, words: candidate.text.split(/\s+/).length });
+        const textAvailableAt = this.textAvailability.availableAt(candidate.text, Date.now());
+        queueMicrotask(() => void this.onCandidate(candidate, textAvailableAt));
+      }
+    } catch (err) {
+      this.log.warn('context_update_failed', { stage: 'observe', err, recovery: 'answers_without_context' });
+    }
+  }
+
+  /** Records an accepted question in the context memory (never a tentative one). */
+  private commitToMemory(question: DetectedQuestion): void {
+    const memory = this.memory;
+    if (!memory) return;
+    try {
+      const decision = memory.commit(this.questionInfo(question));
+      this.log.debug('context_updated', { source: 'question', qid: question.id, route: decision.action, reason: decision.reason, topic: memory.activeTopic?.kind, topics: memory.topicCount });
+    } catch (err) {
+      this.log.warn('context_update_failed', { stage: 'commit', qid: question.id, err, recovery: 'answers_without_context' });
+    }
+  }
+
+  private questionInfo(question: DetectedQuestion): QuestionInfo {
+    const intent = classifyQuestionIntent(question.text);
+    return {
+      id: question.id,
+      text: question.text,
+      ...(question.context ? { context: question.context } : {}),
+      isFollowUp: question.isFollowUp,
+      intentKind: intent.kind,
+      ownSubject: namesOwnSubject(intent.sectionHints),
+    };
+  }
+
   /** One DEBUG line per finished utterance (never per interim result); no transcript text unless LOG_TRANSCRIPTS. */
   private logEvaluation(e: UtteranceEvaluation): void {
     if (!this.log.enabled('debug')) return;
@@ -453,6 +543,7 @@ export class Session {
       s.question.speculative = false;
       s.question.text = candidate.text;
       this.lastAuto = { question: s.question, at: Date.now() };
+      this.commitToMemory(s.question);
       // The final transcript is the same request: keep the running answer instead of generating another one.
       this.log.debug('speculation_confirmed', { qid: s.question.id, rid: s.requestId, intent: candidate.intentType, recovery: 'final_deduplicated' });
       this.send({ type: 'question.updated', questionId: s.question.id, status: 'confirmed', text: candidate.text, ts: Date.now() });
@@ -518,6 +609,7 @@ export class Session {
     };
     this.trackQuestion(question);
     this.lastAuto = { question, at: Date.now() };
+    this.commitToMemory(question);
     const auto = this.sessionConfig?.answerMode === 'auto';
     const requestId = `r-${randomUUID()}`;
     this.log.debug('question_detected', {
@@ -608,6 +700,7 @@ export class Session {
     };
     this.detector.remember(text);
     this.trackQuestion(question);
+    this.commitToMemory(question);
     this.send({ type: 'question.detected', question, ts: Date.now() });
     void this.answer(question, requestId, true, 'manual');
   }
@@ -616,18 +709,27 @@ export class Session {
     const config = this.sessionConfig;
     if (!config) return;
     // Everything below is in-memory and synchronous (sub-millisecond): no I/O before dispatch.
-    const intent = classifyQuestionIntent(question.text);
-    const retrieval =
-      intent.kind === 'general'
-        ? { chunks: [], evidence: 'none' as const }
-        : this.resumeRetriever.retrieve(`${question.text}`, { sectionHints: intent.sectionHints, limit: 3 });
+    const previous = question.isFollowUp && this.lastCompleted ? this.lastCompleted : null;
+    const previousAnswer = previous ? this.answers.answerFor(previous.questionId) : undefined;
+    const conversation = this.conversationContext(question, previous && previousAnswer ? previous.questionId : undefined);
+    let intent = classifyQuestionIntent(question.text);
+    const retrievalQuery = conversation?.personalFollowUp ? `${conversation.personalFollowUp.query} ${question.text}` : question.text;
+    let retrieval: RetrievalResult =
+      intent.kind === 'general' ? { chunks: [], evidence: 'none' } : this.resumeRetriever.retrieve(retrievalQuery, { sectionHints: intent.sectionHints, limit: 3 });
+    // "How big was the team?" after a project question: answered from the resume, retrieved with that question,
+    // when the resume has something on it. Otherwise it is answered as before (not with the "not in your resume" reply).
+    if (conversation?.personalFollowUp && intent.kind === 'general' && this.hasPersonalKnowledge) {
+      const found = this.resumeRetriever.retrieve(retrievalQuery, { sectionHints: [], limit: 3 });
+      if (found.evidence !== 'none') {
+        intent = { kind: 'personal', sectionHints: [] };
+        retrieval = found;
+      }
+    }
     const evidence: AnswerGrounding['evidence'] =
       intent.kind === 'general' ? 'not_needed' : !this.hasPersonalKnowledge ? 'no_resume' : retrieval.evidence;
     const noteExcerpts = this.notesRetriever.size
       ? this.notesRetriever.retrieve(`${question.context ?? ''} ${question.text}`, { sectionHints: [], limit: 2 }).chunks
       : [];
-    const previous = question.isFollowUp && this.lastCompleted ? this.lastCompleted : null;
-    const previousAnswer = previous ? this.answers.answerFor(previous.questionId) : undefined;
     // The question itself is sent separately, so its own segments are not repeated as context.
     const transcript = this.buffer.recent(config.contextSegments, CONTEXT_MAX_CHARS).filter((s) => !question.segmentIds.includes(s.id));
 
@@ -642,6 +744,7 @@ export class Session {
       resumeExcerpts: retrieval.chunks,
       noteExcerpts,
       ...(previous && previousAnswer ? { previousQa: { question: previous.question, answer: previousAnswer } } : {}),
+      ...(conversation?.block ? { conversationContext: conversation.block } : {}),
     });
     const grounding: AnswerGrounding = {
       kind: intent.kind,
@@ -673,8 +776,36 @@ export class Session {
       },
       ...(noEvidence ? { fixedText: insufficientEvidenceMessage(evidence === 'no_resume' ? 'no_resume' : 'none') } : {}),
     });
-    if (ran && this.answers.answerFor(question.id) !== undefined && this.questions.has(question.id)) {
+    const answerText = this.answers.answerFor(question.id);
+    if (ran && answerText !== undefined && this.questions.has(question.id)) {
       this.lastCompleted = { question: question.text, questionId: question.id };
+      // A drafted answer becomes part of the topic summary (not the fixed "add your resume" message).
+      if (!noEvidence && this.memory) {
+        try {
+          this.memory.recordAnswer(question.id, answerText);
+        } catch (err) {
+          this.log.warn('context_update_failed', { stage: 'answer', qid: question.id, err, recovery: 'answers_without_context' });
+        }
+      }
+    }
+  }
+
+  /** Bounded topic summary for an answer prompt; null when memory is off, empty for this topic, or fails. */
+  private conversationContext(question: DetectedQuestion, previousQaId?: string): AnswerContext | null {
+    if (!this.memory) return null;
+    try {
+      const ctx = this.memory.contextFor(this.questionInfo(question), { skipQuestionIds: previousQaId ? [previousQaId] : [] });
+      this.log.debug('context_attached', {
+        qid: question.id,
+        route: ctx.route,
+        topic: ctx.topicKind,
+        context_chars: ctx.block?.length ?? 0,
+        personal_follow_up: ctx.personalFollowUp ? true : undefined,
+      });
+      return ctx;
+    } catch (err) {
+      this.log.warn('context_update_failed', { stage: 'context', qid: question.id, err, recovery: 'answers_without_context' });
+      return null;
     }
   }
 
@@ -689,6 +820,10 @@ export class Session {
     await stt?.finish();
     if (this.sessionId) this.send({ type: 'session.ended', sessionId: this.sessionId, ts: Date.now() });
     this.logAudioSummary('info', 'stopped');
+    // The user stopped listening: the next Start is a new meeting with an empty context. (A dropped
+    // connection does not get here, so a reconnect still finds this session's memory.)
+    if (this.sessionId) this.deps.memory?.release(this.sessionId);
+    this.memory = null;
     this.sessionId = null;
   }
 

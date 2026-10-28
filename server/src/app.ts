@@ -15,6 +15,7 @@ import { log } from './logger.js';
 
 const httpLog = log.child('http');
 const wsLog = log.child('ws');
+import { MemoryStore } from './context/ConversationMemory.js';
 import { ExtractionError, extractResume } from './resume/extract.js';
 import { isAllowedOrigin } from './security/origin.js';
 import { Session } from './session/Session.js';
@@ -30,6 +31,8 @@ export interface AppDeps {
   historyError?: string | null;
   historyDbPath?: string | null;
   tracker?: LatencyTracker;
+  /** Conversation memory shared by this server's connections; null disables it. Default: per CONTEXT_MEMORY. */
+  memory?: MemoryStore | null;
 }
 
 const here = path.dirname(fileURLToPath(import.meta.url));
@@ -40,6 +43,8 @@ const apiError = (res: Response, status: number, code: string, message: string) 
 
 export function createApp(deps: AppDeps): { server: http.Server; wss: WebSocketServer } {
   const { config } = deps;
+  // One store per server: an extension reconnect opens a new connection but resumes the same memory.
+  const memory = deps.memory !== undefined ? deps.memory : config.contextMemory === false ? null : new MemoryStore();
   const app = express();
   app.disable('x-powered-by');
 
@@ -159,7 +164,7 @@ export function createApp(deps: AppDeps): { server: http.Server; wss: WebSocketS
     const send = (event: ServerEvent) => {
       if (ws.readyState === ws.OPEN) ws.send(JSON.stringify(event));
     };
-    const session = new Session(deps, send, log.child('session', { cid }));
+    const session = new Session({ ...deps, memory }, send, log.child('session', { cid }));
     let badMessages = 0;
 
     ws.on('message', (data: RawData, isBinary: boolean) => {

@@ -13,11 +13,17 @@ export interface QuestionIntent {
 
 const PERSONAL_PATTERNS: RegExp[] = [
   /\b(?:tell (?:me|us) (?:a bit |a little )?about yourself|introduce yourself|about yourself|walk (?:me|us) through your)\b/i,
-  /\byour (?:own )?(?:experience|background|resume|cv|career|role|roles|job|jobs|position|team|projects?|work|education|degree|studies|skills?|skill set|strengths?|weakness(?:es)?|achievements?|accomplishments?|responsibilities|current|previous|last|biggest|greatest|proudest|most|favou?rite|tech stack|stack|employer|company|internship)\b/i,
+  /\byour (?:own )?(?:experience|background|resume|cv|career|role|roles|job|jobs|position|team|projects?|work|education|degree|studies|skills?|skill set|strengths?|weakness(?:es)?|achievements?|accomplishments?|responsibilities|current|previous|last|biggest|greatest|proudest|most|favou?rite|tech stack|stack|employer|company|internship|contributions?|involvement|part in|impact|ownership)\b/i,
   /\b(?:have|did|were|do|are) you (?:ever |actually |personally |also )?(?:work|worked|working|use|used|using|build|built|building|lead|led|leading|manage|managed|handle|handled|implement|implemented|design|designed|study|studied|ship|shipped|own|owned|deal|dealt|face|faced|migrate|migrated|mentor|mentored|optimi[sz]e|optimi[sz]ed|deploy|deployed|familiar|experienced|comfortable|proficient)\b/i,
-  /\b(?:a time (?:when|where|that) you|an example (?:of|from) (?:when|a time|your)|a project (?:where|that|in which|you)|a situation (?:where|when) you|a challenge you|a mistake you|a decision you|a conflict you)\b/i,
+  /\bhave you (?:ever )?had (?:a|an|any) (?:conflict|disagreement|situation|problem|challenge|failure|setback|difficult|tough|hard|bad)\b/i,
+  /\b(?:a time (?:when |where |that )?you(?! (?:can|can'?t|cannot|could|would|will|should|might|may|need|want)\b)|an example (?:of|from) (?:when|a time|your)|a project (?:where|that|in which|you)|a situation (?:where |when )?you|a challenge you|a mistake you|a decision you|a conflict you)\b/i,
   /\b(?:where did you (?:study|work|go to)|what did you (?:study|do|build|work on|learn|major in)|how (?:long|many years) have you|years of experience|why did you (?:leave|join|choose|move|decide)|what (?:are|were) you (?:working on|responsible for)|what do you do (?:currently|now|at))\b/i,
   /\b(?:what (?:languages|technologies|frameworks|tools) (?:do|did|have) you)\b/i,
+  // Behavioral prompts about something the user did: "Tell me about the last incident you handled." Only story
+  // nouns: "the schema you designed" in a design discussion is about the design, not the resume.
+  /\b(?:a|an|the|one|that) (?:[\w-]+ ){0,3}(?:incident|outage|project|situation|challenge|conflict|mistake|failure|problem|bug|crisis|deadline|disagreement|migration|launch|initiative|story|achievement|accomplishment|ui|team)s? (?:that )?(?:you|you've|you have) (?:handled|led|worked on|faced|built|managed|made|had|owned|shipped|designed|fixed|resolved|dealt with|ran|did|delivered|debugged|mentored|disagreed|failed|missed|were (?:involved in|part of|responsible for|on))\b/i,
+  // Something from the user's resume: "the payments migration project you listed".
+  /\b(?:projects?|roles?|jobs?|internships?|positions?|company|companies|experience|certifications?|degree)\s+(?:that\s+)?you(?:'ve| have)?\s+(?:listed|mentioned|described|put down|wrote about|included)\b/i,
   // Instructions about the user's own toolkit: "Name three technologies you use regularly."
   /\b(?:technologies|tools|languages|frameworks|databases|libraries|platforms|stacks?) (?:that )?you(?:'ve| have)? (?:use|used|know|prefer|like|work with|worked with|are (?:familiar|comfortable) with)\b/i,
 ];

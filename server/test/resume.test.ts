@@ -47,6 +47,14 @@ describe('question intent', () => {
     ['How would you design a rate limiter?', 'general'],
     ['What is the difference between a process and a thread?', 'general'],
     ['Have you used Redis, and how does it persist data to disk?', 'mixed'],
+    ['Tell me about the last incident you handled.', 'personal'],
+    ['Tell me about a time you missed a deadline.', 'personal'],
+    ['Can you tell me about the payments migration project you listed?', 'personal'],
+    ['Have you ever had a conflict with a designer over a feature?', 'personal'],
+    // About the design under discussion, not the resume (a personal intent without evidence gets a fixed reply).
+    ['What are the trade-offs of the schema you designed?', 'general'],
+    ['What happens if two writes arrive at a time you cannot serialize them?', 'general'],
+    ['Have you had a chance to look at the problem statement?', 'general'],
   ])('%s -> %s', (q, kind) => {
     expect(classifyQuestionIntent(q).kind).toBe(kind);
   });
