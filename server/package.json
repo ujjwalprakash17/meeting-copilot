@@ -17,6 +17,7 @@
     "bench:stt": "tsx bench/stt.ts",
     "bench:e2e": "tsx bench/e2e-real.ts",
     "bench:detection": "tsx bench/detection.ts",
+    "bench:context": "tsx bench/context.ts",
     "history:import": "tsx scripts/import-sqlite-to-supabase.ts"
   },
   "dependencies": {

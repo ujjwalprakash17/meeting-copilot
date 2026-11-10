@@ -22,16 +22,17 @@ Suggestions are drafts for you to review. Nothing is spoken or typed into the me
 6. [Using it](#using-it)
 7. [Resume and personal knowledge](#resume-and-personal-knowledge)
 8. [Question and request detection](#question-and-request-detection)
-9. [How Groq is used](#how-groq-is-used)
-10. [Latency](#latency)
-11. [Conversation history (SQLite)](#conversation-history-sqlite)
+9. [Conversation context](#conversation-context)
+10. [How Groq is used](#how-groq-is-used)
+11. [Latency](#latency)
+12. [Conversation history (SQLite)](#conversation-history-sqlite)
     - [Shared history in Supabase (multi-user)](#shared-history-in-supabase-multi-user)
-12. [Transcription and speaker labels](#transcription-and-speaker-labels)
-13. [Screen sharing: what others can see](#screen-sharing-what-others-can-see)
-14. [Testing](#testing)
-15. [Known limitations](#known-limitations)
-16. [Privacy and security](#privacy-and-security)
-17. [Troubleshooting](#troubleshooting)
+13. [Transcription and speaker labels](#transcription-and-speaker-labels)
+14. [Screen sharing: what others can see](#screen-sharing-what-others-can-see)
+15. [Testing](#testing)
+16. [Known limitations](#known-limitations)
+17. [Privacy and security](#privacy-and-security)
+18. [Troubleshooting](#troubleshooting)
 
 ---
 
@@ -174,6 +175,7 @@ See `.env.example` for the full list with comments. Put them in `server/.env` (t
 | `SPECULATIVE_ANSWERS`, `SPECULATION_MIN_SCORE` | Tentative answers from interim transcripts ([Latency](#latency)) | `true`, `2` |
 | `CLASSIFIER_TIMEOUT_MS` | Deadline for the ambiguous-question classifier | `1500` |
 | `CONTINUATION_WINDOW_MS` | Merge a short follow-on fragment into a question still being answered | `2000` |
+| `CONTEXT_MEMORY` | Experimental conversation context for follow-ups ([details](#conversation-context)); `false` behaves exactly as without the feature | `false` |
 | `HISTORY_ENABLED`, `HISTORY_DB_PATH` | Conversation history database ([details](#conversation-history-sqlite)) | `true`, `server/data/history.sqlite` |
 | `HISTORY_BACKEND` | `sqlite` (this machine only) or `supabase` (shared, per-user accounts; [details](#shared-history-in-supabase-multi-user)) | `sqlite` |
 | `SUPABASE_URL`, `SUPABASE_PUBLISHABLE_KEY`, `SUPABASE_SESSION_PATH` | Supabase project URL, **publishable** key (never the secret key), signed-in session file | unset, unset, `server/data/supabase-session.json` |
@@ -352,6 +354,97 @@ The classifier is measured with `npm run bench:detection -w server -- --classifi
 - The final prompt was correct on 24 of 31 deferred utterances across all sets, with a median latency of about 550 ms. Its remaining errors are mostly statements that end in "?".
 
 **Try it.** Start listening (or Simulation mode) and turn on **Settings → Verbose diagnostic logs**, or set `LOG_LEVEL=debug` on the server. Have someone say "Give the name of your dog." (an answer should appear) and then "I gave the name of my dog yesterday." (nothing should appear). The server terminal shows `[session] utterance_evaluated … decision=accepted intent=imperative_request` and then `decision=rejected`.
+
+---
+
+## Conversation context
+
+**Status: experimental and off by default** (`CONTEXT_MEMORY=false`). It has not passed validation on a fresh held-out set (see [Measured accuracy](#conversation-context) below), so turn it on only to try it.
+
+With `CONTEXT_MEMORY=true`, follow-up questions are answered in the context of what the meeting has been about. For example, the interviewer says "Design a URL shortener" and "We need 10 million requests per day", then asks "How would you scale it?". That question is answered for the URL shortener at that traffic. A switch to an unrelated question starts clean.
+
+**What is kept.** Everything is kept per meeting, in server memory only.
+- **Topics:** a system design, a technical question, or a question about your background. One topic is active, and earlier ones keep their state.
+- **For each topic:**
+  - the requirements and decisions the interviewer stated, one per clause, each either current or replaced: traffic, users, storage, latency, technology choices, features, scope, and other plain statements;
+  - the questions asked on that topic, each with the first sentences of its drafted answer.
+- **Changes:** a newer statement replaces only the requirement it changes; the others said with it stay current. For example:
+  - "Increase it to 100 million" after "10 million requests per day" (shown as "100 million requests per day");
+  - "Actually, make it 200 million daily active users" keeps "each user uploads 2 photos per day" from the same sentence;
+  - "Use DynamoDB instead of Postgres" keeps the traffic said in the Postgres sentence;
+  - "Make it 40,000 drivers", "Change the exam length to two hours", "Double that" (applied to what the sentence before was about);
+  - "Forget the dashboards", "We're not doing video", "the warehouse is BigQuery, not Snowflake";
+  - "no live streaming", then "now wants live streaming too"; "Skip the SMS reminders", then "bring the SMS reminders back" (what the skip removed is current again);
+  - "Only USD", then "EUR and GBP as well" (now USD, EUR, GBP), then "back to only USD";
+  - saying an earlier value again ("Go back to 10 minutes") makes it current again.
+
+  An added constraint doesn't replace anything ("Trip IDs must be globally unique" keeps "a single city"). The replaced statement is listed as no longer current, so the answer doesn't present it as current.
+- **Never kept:** instructions aimed at the assistant ("Ignore all previous instructions…"), transitions ("Let's switch topics"), retractions ("never mind that"), feedback on your answer and interview logistics.
+
+**How an answer uses it.**
+- **What is added:** a short `<conversation_context>` block, placed after the recent transcript. It holds at most 1,200 characters (about 300 tokens):
+  - the current topic and what the question is about;
+  - the current requirements;
+  - the requirements that were replaced;
+  - earlier questions on this topic.
+
+  When space runs out, older replaced statements, older questions and plain statements go first; typed requirements are only shortened.
+- **Prompt protection:** the block is built from the transcript and treated as untrusted data. When it is attached, the system prompt lists it with the other untrusted sections, it cannot contain `<` or `>`, and its tag is stripped from every other section.
+- **Earlier topics** are included only when the interviewer returns to one. That can be explicit ("Going back to the URL shortener…") or a question that is clearly about it.
+- **The first question of a topic** gets no block unless requirements were stated with it.
+- **Resume retrieval:** for a short background follow-up ("What was your role?"), retrieval uses the question it follows as well. A general question asked after a story ("How would you make retries safe in general?") is not treated as part of it.
+- **Tentative answers:** an answer started from the interim transcript uses the corrections said just before the question. If the final transcript changes a requirement that answer relied on, it is redrafted.
+
+**Topic changes** are decided locally, with no extra LLM call.
+
+| Signal | Example | Result |
+| --- | --- | --- |
+| Explicit switch | "Let's move on", "Different question", "Let's leave design for now", also said on its own before the next question | New topic (requirements said after it go to the new topic) |
+| Return | "Going back to deadlocks…", "Coming back to the booking system", "…with our numbers", "On the pipeline thing again" | The earlier topic, with its state |
+| New design task | "Design a chat app", "Design that pipeline for me", "Okay, today let's design a ride-sharing service" | New design topic |
+| Design round announced | "Let's do an ML system design." then a question | The next topic is a design |
+| Remark about designing | "Last year we had to design a billing system" | No change |
+| Concept question during a design | "What's the difference between a process and a thread?" | Its own topic, without the design's requirements |
+| Question about this design | "What is a good shard key here?" | Same topic |
+| Follow-up | "How would you scale it?", "What if the cache fails?", "Which one…?", "How do you deal with bad connections?" | Same topic |
+| Background follow-up | "What was your role?", "What would you do differently?" after a project or story | Same story |
+
+**Statements that are answered.** Two statements are answered as requests: a design task ("Okay, today let's design a ride-sharing service like Uber.") and, while a design is discussed, an instruction for its next step that starts with "now" or "next" ("Now add authentication."). Neither cancels an answer that is still streaming: it is answered after that answer finishes. Other statements ("Add caching.", "Include authentication.", "Group chat is out of scope.") only update the requirements. None of this happens when `CONTEXT_MEMORY=false`.
+
+**Scope**
+- Nothing is written to disk, and no transcript is stored for this feature.
+- A new Start begins empty, so nothing carries over between meetings. An extension reconnect within the same Start keeps the context, and Stop releases it. A late result for a meeting that was stopped or disconnected is never recorded.
+- A meeting's context expires after 3 hours without any statement, question or answer. The server keeps at most 50 meetings and drops the least recently used first.
+- Restarting the server clears it.
+- The context comes from what the other participants say. Your microphone isn't captured, so decisions you state aren't known. Drafted answers are included, labelled as drafts.
+- With `CONTEXT_MEMORY=false` (the default) the server behaves exactly as without the feature. This was checked against the previous version through the real server on 44 conversations: all 336 answer prompts without a resume and all 342 with one were byte-identical, with the same questions and the same grounding.
+
+**Measured accuracy.** Run `npm run bench:context -w server -- --set <file>` to measure. It runs offline, with no API calls.
+- **Data:** conversations written as text by separate agents. Each turn is labelled with:
+  - its topic;
+  - requirements that must be present;
+  - requirements that were replaced;
+  - text from other topics that must not leak in.
+- **Fixtures:** sets A and B are in `server/test/fixtures/contextConversations.independentA.json` and `independentB.json`. The rules were tuned on them, so their scores are not an independent measure.
+- **Fresh held-out set E:** 18 conversations, 314 turns, 187 questions, written by a separate agent that never saw the code or the other sets, before the last round of changes and kept apart from them. It was run once on the frozen code and nothing was changed afterwards. An earlier held-out set (D) was inspected while fixing its failures, so it is no longer independent.
+
+| Set | Same topic kept | New topic started | Returned to earlier topic | Current requirement missing | Replaced shown as current | Leaked from other topics |
+| --- | --- | --- | --- | --- | --- | --- |
+| **Held-out E, single run** | 125/138 (91%) | 30/35 (86%) | 8/10 (80%) | 35/165 | 37/68 | 6/52 |
+| Held-out E, previous version (same set, also untouched) | 111/138 (80%) | 30/35 (86%) | 8/10 (80%) | 52/165 | 36/68 | 2/52 |
+| Set D (tuned on in the last round) | 119/119 (100%) | 35/36 (97%) | 13/14 (93%) | 22/228 | 12/49 (all 12 correct "X instead of Y" lines) | 4/113 |
+| Set A (tuned on) | 55/56 (98%) | 29/29 (100%) | 8/8 (100%) | 0/75 | 0/28 | 0/71 |
+| Set B (tuned on) | 64/66 (97%) | 35/35 (100%) | 5/6 (83%) | 0/96 | 0/25 | 2/73 |
+
+"Replaced shown as current" counts a replaced value that appears anywhere in the current requirements, so a correct "Use DynamoDB instead of Postgres" also counts against "Postgres". On set E almost all 37 are genuine: changes worded differently from the original ("five thousand units" for "1,200 robots", "double that ingest"), values changed back, and features brought back with new wording. 4 of the 187 questions are missed by the detector itself and get no context.
+
+These are written conversations, not recordings of real meetings, so accuracy in live interviews hasn't been measured. On the fresh set, follow-ups mostly stay on their topic, but more than half of the changed requirements are still shown with their old value, which is why the feature stays off by default.
+
+**Cost** (mock provider only; real Groq latency with the feature has not been measured)
+- **LLM calls:** only the statements answered as requests add calls: 8 extra answers over 44 written conversations (344 prompts instead of 336). Nothing else calls an LLM.
+- **Tokens:** a block was attached to 234 of those 344 prompts: median 991 characters (about 250 tokens), at most 1,200 (about 300). In total the prompts grew from 297,179 to 533,793 characters.
+- **Processing:** p50 0.19 ms and p95 0.78 ms per finalized utterance on the held-out set E (the first one after start pays about 0.15 s of pattern compilation, done when the server starts).
+- **Mock latency benchmark** (50 requests each): time to first text p50/p95/max was 2/5/7 ms before the feature, 2/6/7 ms with it off and 3/6–8/38–41 ms with it on (two runs).
 
 ---
 
@@ -705,6 +798,19 @@ The automated tests cover:
   - direct, technical, imperative, indirect, follow-ups; split across segments; debounce and partial-activity postponement; duplicate finals; repeated questions; fillers ("can you hear me?", "…, right?"); ambiguous embedded clauses;
   - `requestDetection.test.ts`: a table of 163 labelled utterances (`test/fixtures/questionCorpus.ts`), each checked for answer/classifier/ignore, request form and context need; 560 independently written utterances (`test/fixtures/independentUtterances.json`) with an explicit list of the known errors;
   - interim to final with one answer, speaker changes and label flicker, scenarios split from their question, duplicates and replays, the classifier's inputs and outputs, and the diagnostic log lines (no transcript text).
+- **Conversation context**:
+  - `conversationMemory.test.ts` covers:
+    - topic routing: switches, returns, concept questions during a design, rapid-fire questions, background follow-ups;
+    - corrections: numbers, technologies, scope narrowed or widened, a correction announced in its own sentence, additions that are not corrections;
+    - replays, previews that change nothing, pending answers, the bounds over a long session, and session isolation.
+  - `contextAudit.test.ts` has one regression test per finding of the verification audit: the feature off by default and main's question intent, requirement replacement and preservation, statements that must not be answered, topic switches and returns, prompt protection, tentative answers after a spoken correction, and lifecycle races (dropped connection, Stop and Start, slow classifier, repeated "Answer now").
+  - `contextPipeline.test.ts` runs over a real WebSocket and covers:
+    - design continuity, and byte-identical prompts with the feature off;
+    - a reconnect vs a new Start vs a Stop;
+    - duplicates, and requests promoted from statements;
+    - resume grounding of a follow-up;
+    - the memory or the classifier failing;
+    - fast consecutive questions.
 - **Resume**: heading detection and sectioning, contact redaction, intent classification, retrieval with evidence that is present (transaction volume, Kafka, "tell me about yourself"), absent (education, Elixir) and ambiguous (leadership ↔ "mentored", "led the migration"). Also real PDF, DOCX and TXT extraction from generated files, and rejection of empty, oversized, unsupported, legacy `.doc`, malformed and text-less files.
 - **Providers**: Deepgram message parsing and URL building, Groq error mapping (401/429/404/5xx/timeout/network, `retry-after`), and prompt building, including neutralisation of injected tags.
 - **AnswerService**: streaming, dedupe, supersede, user cancel, first-token timeout, fixed no-LLM answers.
@@ -781,7 +887,14 @@ Use the manual procedures above for these.
   - Without `GROQ_DETECTION_MODEL`, fragments without "?" and bare scenarios are not answered.
 
   Use Manual mode or "Answer now" when needed. Accuracy on real meeting audio hasn't been measured.
-- **Reconnects:** if the server connection drops, the extension reconnects (up to 5 attempts) and starts a fresh server session. Audio during the gap is dropped and server-side context (recent transcript, previous answer) resets. The UI keeps the history. Deepgram reconnects are also bounded, with about 3 s of audio buffered.
+- **Reconnects:** if the server connection drops, the extension reconnects (up to 5 attempts) and starts a fresh server session. Audio during the gap is dropped and the recent transcript and previous answer reset. With `CONTEXT_MEMORY=true`, the [conversation context](#conversation-context) (topics and requirements) is kept, although the extension's status line still says "server-side context was reset". The UI keeps the history.
+- **Conversation context** (experimental, off by default) is rule-based and English-oriented. On a fresh held-out set it still misses changes and returns that a person would catch (see [Measured accuracy](#conversation-context)). Known gaps:
+  - A change is missed when it names the requirement in other words ("five thousand units" after "1,200 robots", "double that ingest" after "2 TB of logs per day"); on the fresh held-out set more than half of the changed requirements were still shown with their old value.
+  - Changing a value back, or bringing back something that was taken out, is only recognised in common wordings ("go back to 10 minutes", "bring the SMS reminders back").
+  - A concept or resume question asked in the middle of a design can be filed under the design, and a design task the detector misses as a question can leave its follow-ups split up.
+  - A follow-up that needs domain knowledge to connect can start its own topic. For example, "What's a stop-the-world pause?" after a garbage collection question. It is then answered without that topic's context, the way it would be without the feature.
+  - A question the detector misses gets no context.
+  - The context lives in server memory, so a server restart clears it. Deepgram reconnects are also bounded, with about 3 s of audio buffered.
 - **Resume retrieval** is keyword-based with a small synonym list. Paraphrases with no shared terms ("cloud-native" vs "Kubernetes") may be missed. OCR, embeddings and semantic search are not implemented.
 - **Window focus:** `focused: false` for the assistant window is honoured by Chrome on common desktops, but window managers may differ.
 - **Tentative answers** depend on Deepgram adding terminal punctuation to interim results. When it doesn't, the answer starts at the final transcript (the earlier behavior).
@@ -892,6 +1005,7 @@ The one opt-in exception is `LOG_TRANSCRIPTS=true` on the server, which logs fin
 | `server` / `config` / `process` | `listening`, `config`, `listen_failed` (for example `EADDRINUSE`), `invalid`, `stt_not_configured`, `llm_not_configured`, `uncaught_exception`, `unhandled_rejection`, `shutting_down` |
 | `ws` / `session` (server) | `connected`, `origin_rejected`, `invalid_message`, `disconnected`, `started`, `audio_frame_invalid`, `audio_rate_exceeded`, `stopped`, `closed` |
 | `session` (server, question detection, DEBUG) | `utterance_evaluated` (`source=final`, `decision=accepted\|ambiguous\|rejected\|duplicate`, `intent`, `requires_context`, `score`, `reasons`, `detect_ms`), `speculation_started` (`source=interim`, `qid`, `rid`), `speculation_confirmed` (`recovery=final_deduplicated`), `tentative_retracted`, `classifier_decision` (`is_question`, `intent`, `duration_ms`), `classifier_skipped`, `classifier_failed`, `duplicate_suppressed`, `question_detected` (`source=heuristics\|classifier`, `intent`, `answer_triggered`, `rid`) |
+| `session` (server, conversation context, DEBUG) | `context_ready` (`resumed`, `topics`), `context_updated` (`source=statement\|question`, `route`, `reason`, `topic`, `facts_changed`), `context_attached` (`route`, `topic`, `context_chars`, `personal_follow_up`), `context_promoted_request` (`kind=design_task\|design_extension`, `recovery=deferred_until_answer_finishes`), `context_promoted_request_dropped` (`reason=stale`); WARN `context_update_failed` (`stage`, `recovery=answers_without_context`) |
 | `deepgram` | `connecting`, `connected`, `http_error` (`status`, `auth`, `provider_request_id`), `provider_error`, `closed`, `websocket_reconnecting`, `reconnect_gave_up` |
 | `groq` / `mock` | `models_verified`, `models_unavailable`, `generation_completed` (`ttft_ms`, `duration_ms`), `generation_failed` (`code`, `status`, `retryable`, `retry_after_ms`, `provider_request_id`) |
 | `history-db` / `history-api` | `opened`, `open_failed`, `flushed`, `write_failed` (`recovery=retry_once` then `batch_dropped_ui_notified`), `request_failed`, `conversation_deleted`, `all_deleted` |
