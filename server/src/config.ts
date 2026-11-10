@@ -58,9 +58,23 @@ export interface LatencyConfig {
   continuationWindowMs: number;
 }
 
+export type HistoryBackend = 'sqlite' | 'supabase';
+
 export interface HistoryConfig {
   enabled: boolean;
+  /** Where history is stored: local SQLite file (default) or the shared Supabase Postgres database. */
+  backend?: HistoryBackend;
   dbPath: string;
+  supabase?: SupabaseConfig;
+}
+
+export interface SupabaseConfig {
+  /** Project URL, e.g. https://<ref>.supabase.co */
+  url: string | null;
+  /** Publishable (anon) key. Safe to ship: Row Level Security limits each signed-in user to their own rows. */
+  publishableKey: string | null;
+  /** Local file that keeps the signed-in user's Supabase session (refresh token) between restarts. */
+  sessionPath: string;
 }
 
 export const DEFAULT_LATENCY: LatencyConfig = { speculative: true, speculationMinScore: 2, classifierTimeoutMs: 1_500, continuationWindowMs: 2_000 };
@@ -140,7 +154,17 @@ export function loadConfig(): ServerConfig {
     },
     history: {
       enabled: bool('HISTORY_ENABLED', true),
+      backend: (() => {
+        const v = (str('HISTORY_BACKEND') ?? 'sqlite').toLowerCase();
+        if (v !== 'sqlite' && v !== 'supabase') throw new Error(`HISTORY_BACKEND must be sqlite or supabase (got "${v}")`);
+        return v as HistoryBackend;
+      })(),
       dbPath: path.resolve(str('HISTORY_DB_PATH') ?? path.resolve(here, '../data/history.sqlite')),
+      supabase: {
+        url: str('SUPABASE_URL'),
+        publishableKey: secret('SUPABASE_PUBLISHABLE_KEY') ?? secret('SUPABASE_ANON_KEY'),
+        sessionPath: path.resolve(str('SUPABASE_SESSION_PATH') ?? path.resolve(here, '../data/supabase-session.json')),
+      },
     },
   };
 }

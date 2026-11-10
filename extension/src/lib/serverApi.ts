@@ -5,6 +5,7 @@ import {
   monotonicNow,
   LIMITS,
   RESUME_FILE_TYPES,
+  type AccountStatus,
   type ApiErrorBody,
   type ConversationDetailResponse,
   type ConversationListResponse,
@@ -15,7 +16,7 @@ export interface ServerStatus {
   stt: { provider: string; configured: boolean };
   llm: { provider: string; model: string; configured: boolean; simulated: boolean; verified: boolean | null; message: string };
   detectionModel: string | null;
-  history?: { enabled: boolean; error: string | null };
+  history?: { enabled: boolean; error: string | null; backend?: 'sqlite' | 'supabase' };
 }
 
 export class ApiError extends Error {
@@ -81,7 +82,26 @@ export async function extractResume(serverUrl: string, file: File): Promise<Resu
 }
 
 // ---------------------------------------------------------------------------
-// Conversation history (stored in the local server's SQLite database)
+// Account (Supabase Auth, used when the server stores history in Supabase)
+// The password goes to the local server, which passes it to Supabase Auth and keeps only the session.
+// ---------------------------------------------------------------------------
+
+export const fetchAccount = (serverUrl: string) => request<AccountStatus>(serverUrl, '/api/account', { timeoutMs: 10_000 });
+
+const credentialsRequest = (serverUrl: string, path: string, email: string, password: string) =>
+  request<AccountStatus>(serverUrl, path, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ email, password }),
+    timeoutMs: 20_000,
+  });
+
+export const signIn = (serverUrl: string, email: string, password: string) => credentialsRequest(serverUrl, '/api/account/sign-in', email, password);
+export const signUp = (serverUrl: string, email: string, password: string) => credentialsRequest(serverUrl, '/api/account/sign-up', email, password);
+export const signOut = (serverUrl: string) => request<AccountStatus>(serverUrl, '/api/account/sign-out', { method: 'POST', timeoutMs: 10_000 });
+
+// ---------------------------------------------------------------------------
+// Conversation history (stored by the server in local SQLite or in Supabase)
 // ---------------------------------------------------------------------------
 
 export const listConversations = (serverUrl: string, before?: number) =>

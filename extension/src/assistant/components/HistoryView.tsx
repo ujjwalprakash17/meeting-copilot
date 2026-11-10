@@ -50,6 +50,7 @@ function SavedCard({ card }: { card: CardRecord }) {
 export function HistoryView({ serverUrl, currentConversationId, onCurrentDeleted }: Props) {
   const [list, setList] = useState<ConversationSummary[] | null>(null);
   const [dbPath, setDbPath] = useState<string | null>(null);
+  const [backend, setBackend] = useState<'sqlite' | 'supabase'>('sqlite');
   const [open, setOpen] = useState<ConversationDetailResponse | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
@@ -61,6 +62,7 @@ export function HistoryView({ serverUrl, currentConversationId, onCurrentDeleted
       const res = await listConversations(serverUrl);
       setList(res.conversations);
       setDbPath(res.dbPath);
+      setBackend(res.backend ?? 'sqlite');
       setError(null);
     } catch (err) {
       setError((err as Error).message);
@@ -188,7 +190,10 @@ export function HistoryView({ serverUrl, currentConversationId, onCurrentDeleted
         </button>
       ))}
       <p className="hint">
-        Saved on the machine running the local server{dbPath ? ` (${dbPath})` : ''}: questions, suggested answers and small metadata only.
+        {backend === 'supabase'
+          ? 'Saved to your account in the shared Supabase database (only you can read it): '
+          : `Saved on the machine running the local server${dbPath ? ` (${dbPath})` : ''}: `}
+        questions, suggested answers and small metadata only.
         No audio, transcripts or resume text. Deleting here removes the records from that database; it does not undo what was already
         sent to Deepgram or Groq.
       </p>

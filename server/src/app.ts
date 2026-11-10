@@ -8,6 +8,8 @@ import { elapsedMs, LIMITS, monotonicNow, parseClientEvent, type ApiErrorBody, t
 import type { ServerConfig } from './config.js';
 import type { HistoryWriter } from './history/HistoryWriter.js';
 import { historyRouter, type HistoryState } from './history/routes.js';
+import { accountRouter, CONFIRMED_PAGE } from './account/routes.js';
+import type { SupabaseAccount } from './account/SupabaseAccount.js';
 import { generateInsight, MAX_INSIGHT_TRANSCRIPT_CHARS, type InsightKind } from './insights/insights.js';
 import { latencyTracker, summarize, type LatencyTracker } from './latency/LatencyTracker.js';
 import { LlmError, type LlmProvider } from './llm/types.js';
@@ -29,6 +31,9 @@ export interface AppDeps {
   history?: HistoryWriter | null;
   historyError?: string | null;
   historyDbPath?: string | null;
+  historyBackend?: 'sqlite' | 'supabase';
+  /** Signed-in Supabase user (HISTORY_BACKEND=supabase); null for the SQLite backend. */
+  account?: SupabaseAccount | null;
   tracker?: LatencyTracker;
 }
 
@@ -63,8 +68,18 @@ export function createApp(deps: AppDeps): { server: http.Server; wss: WebSocketS
   app.get('/health', (_req, res) => res.json({ ok: true }));
 
   // Provider status (no secrets): lets the extension show what is configured.
-  const historyState: HistoryState = { writer: deps.history ?? null, error: deps.historyError ?? null, dbPath: deps.historyDbPath ?? null };
+  const historyState: HistoryState = {
+    writer: deps.history ?? null,
+    error: deps.historyError ?? null,
+    dbPath: deps.historyDbPath ?? null,
+    backend: deps.historyBackend ?? 'sqlite',
+  };
   app.use('/api/history', historyRouter(historyState));
+  app.use(
+    '/api/account',
+    accountRouter({ account: deps.account ?? null, writer: deps.history ?? null, confirmRedirectUrl: `http://${['0.0.0.0', '::'].includes(config.host) ? '127.0.0.1' : config.host}:${config.port}/auth/confirmed` }),
+  );
+  app.get('/auth/confirmed', (_req, res) => res.type('html').send(CONFIRMED_PAGE));
 
   // Latency summary (timestamps only, no content). Real-provider and simulated runs are reported separately.
   app.get('/api/metrics/latency', (_req, res) => {
@@ -83,7 +98,7 @@ export function createApp(deps: AppDeps): { server: http.Server; wss: WebSocketS
 
   app.get('/api/status', (_req, res) => {
     res.json({
-      history: { enabled: Boolean(deps.history), error: deps.historyError ?? null },
+      history: { enabled: Boolean(deps.history), error: deps.historyError ?? null, backend: deps.historyBackend ?? 'sqlite' },
       stt: { provider: deps.liveStt.name, configured: deps.liveStt.isConfigured() },
       llm: deps.llm.status(),
       detectionModel: deps.llm.classifyJson && config.llm.groqDetectionModel ? config.llm.groqDetectionModel : null,

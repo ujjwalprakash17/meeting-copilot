@@ -6,6 +6,7 @@ import { clearAllLocalData, clearHistory, saveSettings, type ExtensionSettings, 
 import { getDebugLogging, setDebugLogging } from '../../lib/log.js';
 import { ResumeSection } from './ResumeSection.js';
 import { SharingCard } from './SharingCard.js';
+import { AccountCard } from './AccountCard.js';
 
 function ProviderStatus({ serverUrl }: { serverUrl: string }) {
   const [status, setStatus] = useState<ServerStatus | null>(null);
@@ -91,6 +92,8 @@ export function SettingsView({ settings, resume, active }: { settings: Extension
 
   return (
     <div className="stack">
+      <AccountCard serverUrl={settings.serverUrl} />
+
       <div className="card">
         <strong>Answers</strong>
         <label>Answer mode</label>

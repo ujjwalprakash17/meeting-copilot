@@ -1,3 +1,4 @@
+import type { SupabaseAccount } from '../src/account/SupabaseAccount.js';
 import type { AddressInfo } from 'node:net';
 import WebSocket from 'ws';
 import { AUDIO_FORMAT, DEFAULT_SESSION_CONFIG, parseServerEvent, type ServerEvent, type SessionConfig } from '@meeting-copilot/shared';
@@ -41,6 +42,8 @@ export async function startApp(opts: {
   speed?: number;
   llm?: LlmProvider;
   history?: HistoryWriter | null;
+  /** Supabase account (HISTORY_BACKEND=supabase); omitted = SQLite backend. */
+  account?: SupabaseAccount | null;
   config?: Partial<ServerConfig>;
   /** Replaces the live transcriber (e.g. a replay of recorded Deepgram responses). */
   liveStt?: SttProvider;
@@ -53,6 +56,8 @@ export async function startApp(opts: {
     simulatedStt: new SimulatedSttProvider(opts.speed ?? 1, opts.script),
     llm: opts.llm ?? new MockLlmProvider(2),
     history: opts.history ?? null,
+    historyBackend: opts.account ? 'supabase' : 'sqlite',
+    account: opts.account ?? null,
     tracker,
   });
   await new Promise<void>((r) => server.listen(0, '127.0.0.1', r));

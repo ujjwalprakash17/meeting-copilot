@@ -10,6 +10,7 @@ import express, { type Request, type Response, type Router } from 'express';
 import { z } from 'zod';
 import { UUID_RE, type ApiErrorBody } from '@meeting-copilot/shared';
 import { log } from '../logger.js';
+import { AuthRequiredError } from '../account/SupabaseAccount.js';
 
 const apiLog = log.child('history-api');
 import type { HistoryWriter } from './HistoryWriter.js';
@@ -28,6 +29,8 @@ export interface HistoryState {
   /** Why history is unavailable (e.g. database could not be opened). */
   error: string | null;
   dbPath: string | null;
+  /** Storage backend, shown in the extension. */
+  backend?: 'sqlite' | 'supabase';
 }
 
 export function historyRouter(state: HistoryState): Router {
@@ -52,6 +55,7 @@ export function historyRouter(state: HistoryState): Router {
       // Reads include anything still queued, so the list reflects the latest answers.
       await fn(req, res, state.writer as HistoryWriter);
     } catch (err) {
+      if (err instanceof AuthRequiredError) return apiError(res, 401, err.code, err.message);
       apiLog.error('request_failed', { method: req.method, route: req.route?.path ?? req.path.replace(/[0-9a-f-]{36}/gi, ':id'), err });
       apiError(res, 500, 'history_error', `History database error: ${(err as Error).message}`);
     }
@@ -63,7 +67,7 @@ export function historyRouter(state: HistoryState): Router {
       const q = ListQuery.safeParse(req.query);
       if (!q.success) return apiError(res, 400, 'bad_request', 'Invalid list parameters.');
       await writer.flush();
-      res.json({ conversations: await writer.repository.listConversations(q.data), dbPath: state.dbPath });
+      res.json({ conversations: await writer.repository.listConversations(q.data), dbPath: state.dbPath, backend: state.backend ?? 'sqlite' });
     }),
   );
 

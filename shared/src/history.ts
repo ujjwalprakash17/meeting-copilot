@@ -33,10 +33,27 @@ export interface ConversationSummary {
   cardCount: number;
 }
 
+export type HistoryBackend = 'sqlite' | 'supabase';
+
 export interface ConversationListResponse {
   conversations: ConversationSummary[];
-  /** Absolute path of the SQLite database file on the machine running the server. */
+  /** Absolute path of the SQLite database file on the machine running the server (null for Supabase). */
   dbPath: string | null;
+  /** Where history is stored. Older servers omit it (= sqlite). */
+  backend?: HistoryBackend;
+}
+
+/** GET /api/account: the Supabase user signed in on the local server. Never contains tokens. */
+export interface AccountStatus {
+  backend: HistoryBackend;
+  /** True when the server is set up for Supabase (HISTORY_BACKEND=supabase with URL and key). */
+  configured: boolean;
+  signedIn: boolean;
+  email: string | null;
+  userId: string | null;
+  projectUrl: string | null;
+  /** Sign-up only: the user must open the confirmation email before signing in. */
+  needsConfirmation?: boolean;
 }
 
 export interface ConversationDetailResponse {

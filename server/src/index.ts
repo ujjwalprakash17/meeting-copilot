@@ -2,6 +2,8 @@ import { createApp } from './app.js';
 import { loadConfig, type ServerConfig } from './config.js';
 import { HistoryWriter } from './history/HistoryWriter.js';
 import { SqliteHistoryRepository } from './history/SqliteHistoryRepository.js';
+import { SupabaseHistoryRepository } from './history/SupabaseHistoryRepository.js';
+import { SupabaseAccount } from './account/SupabaseAccount.js';
 import { GroqProvider } from './llm/groq.js';
 import { MockLlmProvider } from './llm/mock.js';
 import type { LlmProvider } from './llm/types.js';
@@ -55,26 +57,54 @@ if (config.llm.provider === 'mock') {
   llm = groq;
 }
 
-// Conversation history (local SQLite). A failure to open it disables history but never the copilot.
+// Conversation history: local SQLite (default) or shared Supabase Postgres (HISTORY_BACKEND=supabase).
+// A failure to open it disables history but never the copilot.
 const dbLog = log.child('history-db');
 let history: HistoryWriter | null = null;
 let historyError: string | null = null;
+let account: SupabaseAccount | null = null;
 const historyConfig = config.history ?? { enabled: true, dbPath: '' };
-if (historyConfig.enabled) {
+const historyBackend = historyConfig.backend ?? 'sqlite';
+if (!historyConfig.enabled) {
+  historyError = 'Conversation history is disabled (HISTORY_ENABLED=false).';
+  dbLog.info('disabled', { reason: 'HISTORY_ENABLED=false' });
+} else if (historyBackend === 'supabase') {
+  const sb = historyConfig.supabase;
+  if (!sb?.url || !sb.publishableKey) {
+    historyError = 'HISTORY_BACKEND=supabase needs SUPABASE_URL and SUPABASE_PUBLISHABLE_KEY in server/.env.';
+    dbLog.error('supabase_not_configured', { recovery: 'history_disabled_copilot_continues' });
+  } else {
+    try {
+      account = new SupabaseAccount({ url: sb.url, publishableKey: sb.publishableKey, sessionPath: sb.sessionPath });
+      history = new HistoryWriter(new SupabaseHistoryRepository(account), { debounceMs: 600, maxDelayMs: 3_000 });
+      dbLog.info('opened', { backend: 'supabase', url: sb.url });
+    } catch (err) {
+      historyError = `Supabase history unavailable: ${(err as Error).message}`;
+      dbLog.error('open_failed', { backend: 'supabase', err, recovery: 'history_disabled_copilot_continues' });
+    }
+  }
+} else {
   try {
     const repo = new SqliteHistoryRepository(historyConfig.dbPath);
     history = new HistoryWriter(repo);
-    dbLog.info('opened', { path: historyConfig.dbPath, schema_version: repo.schemaVersion() });
+    dbLog.info('opened', { backend: 'sqlite', path: historyConfig.dbPath, schema_version: repo.schemaVersion() });
   } catch (err) {
     historyError = `History database unavailable: ${(err as Error).message}`;
     dbLog.error('open_failed', { path: historyConfig.dbPath, err, recovery: 'history_disabled_copilot_continues' });
   }
-} else {
-  historyError = 'Conversation history is disabled (HISTORY_ENABLED=false).';
-  dbLog.info('disabled', { reason: 'HISTORY_ENABLED=false' });
 }
 
-const { server, wss } = createApp({ config, liveStt, simulatedStt, llm, history, historyError, historyDbPath: history ? historyConfig.dbPath : null });
+const { server, wss } = createApp({
+  config,
+  liveStt,
+  simulatedStt,
+  llm,
+  history,
+  historyError,
+  historyDbPath: history && historyBackend === 'sqlite' ? historyConfig.dbPath : null,
+  historyBackend,
+  account,
+});
 
 const onListenError = (err: NodeJS.ErrnoException) => {
   serverLog.error('listen_failed', {
@@ -97,7 +127,7 @@ server.listen(config.port, config.host, () => {
     llm: `${llm.name}/${llm.model}`,
     llm_configured: llm.isConfigured(),
     detection_model: config.llm.groqDetectionModel ?? 'off',
-    history: history ? 'on' : 'off',
+    history: history ? historyBackend : 'off',
     allowed_extensions: config.allowedExtensionIds.length || 'any',
   });
   if (!liveStt.isConfigured()) serverLog.warn('stt_not_configured', { hint: 'set DEEPGRAM_API_KEY in server/.env (Simulation mode still works)' });

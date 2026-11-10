@@ -25,6 +25,7 @@ Suggestions are drafts for you to review. Nothing is spoken or typed into the me
 9. [How Groq is used](#how-groq-is-used)
 10. [Latency](#latency)
 11. [Conversation history (SQLite)](#conversation-history-sqlite)
+    - [Shared history in Supabase (multi-user)](#shared-history-in-supabase-multi-user)
 12. [Transcription and speaker labels](#transcription-and-speaker-labels)
 13. [Screen sharing: what others can see](#screen-sharing-what-others-can-see)
 14. [Testing](#testing)
@@ -174,6 +175,8 @@ See `.env.example` for the full list with comments. Put them in `server/.env` (t
 | `CLASSIFIER_TIMEOUT_MS` | Deadline for the ambiguous-question classifier | `1500` |
 | `CONTINUATION_WINDOW_MS` | Merge a short follow-on fragment into a question still being answered | `2000` |
 | `HISTORY_ENABLED`, `HISTORY_DB_PATH` | Conversation history database ([details](#conversation-history-sqlite)) | `true`, `server/data/history.sqlite` |
+| `HISTORY_BACKEND` | `sqlite` (this machine only) or `supabase` (shared, per-user accounts; [details](#shared-history-in-supabase-multi-user)) | `sqlite` |
+| `SUPABASE_URL`, `SUPABASE_PUBLISHABLE_KEY`, `SUPABASE_SESSION_PATH` | Supabase project URL, **publishable** key (never the secret key), signed-in session file | unset, unset, `server/data/supabase-session.json` |
 | `HOST`, `PORT` | Bind address | `127.0.0.1`, `8787` |
 | `ALLOWED_EXTENSION_IDS` | Restrict connections to your extension ID(s) | empty = any extension origin |
 | `LOG_LEVEL`, `LOG_TRANSCRIPTS` | Logging; transcripts are not logged unless enabled | `info`, `false` |
@@ -569,6 +572,28 @@ If a write fails, it is retried once. Then the UI shows "Conversation history co
 The persistence layer is the `HistoryRepository` interface in `server/src/history/types.ts`. A hosted backend such as Supabase could implement it without changing the session pipeline or the extension. None is added, and nothing syncs to the cloud.
 
 ---
+
+### Shared history in Supabase (multi-user)
+
+Set `HISTORY_BACKEND=supabase` to store history in a hosted Supabase Postgres database instead of the local SQLite file. Every user then signs in with their own account and sees only their own conversations, from any computer.
+
+**How it works**
+- Each user still runs their own server; that server signs in to Supabase as that user (Settings → **Account** in the extension) and keeps the session in `server/data/supabase-session.json` (git-ignored, refreshed automatically).
+- All queries use the **publishable** key plus the user's access token. Postgres **Row Level Security** limits every read and write to rows whose `user_id` is the signed-in user. The secret / service-role key is never used and must never be put in `.env`: every user's machine has a copy of that file.
+- Until someone signs in, the History tab shows "Sign in…", and live answers keep working (history writes just fail with a notice).
+- The SQLite backend stays available: set `HISTORY_BACKEND=sqlite` to go back.
+
+**Schema:** `supabase/migrations/20261110000000_history.sql`: tables `conversations` and `cards` keyed by `(user_id, id)`, a `conversation_summaries` view (security invoker), and two functions: `apply_history_batch` (one-transaction upsert where an older card never overwrites a newer one) and `delete_all_history`. Anonymous access is revoked. Apply it with the Supabase SQL editor or `supabase db push`.
+
+**Set up a new project**
+1. Create a Supabase project and run the migration SQL above.
+2. Authentication → URL Configuration: Site URL `http://127.0.0.1:8787/auth/confirmed`, and add `http://127.0.0.1:8787/**` to Redirect URLs (the sign-up confirmation link lands on that local page).
+3. In `server/.env`: `HISTORY_BACKEND=supabase`, `SUPABASE_URL=https://<ref>.supabase.co`, `SUPABASE_PUBLISHABLE_KEY=sb_publishable_…` (Project Settings → API Keys).
+4. Restart the server, open Settings → Account, create an account, confirm the email, sign in.
+
+**Move existing local history:** sign in once from the extension, stop the server, then run `npm run history:import -w server` (`-- --dry-run` to only count). It upserts, so re-running is safe, and the SQLite file is left untouched.
+
+**Limits to know:** Supabase's built-in email sender is rate-limited (a few sign-up emails per hour) and meant for testing; for more users configure custom SMTP under Authentication → Emails. The Free plan pauses a project after a week without activity.
 
 ## Transcription and speaker labels
 
