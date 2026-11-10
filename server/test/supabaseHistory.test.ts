@@ -1,10 +1,12 @@
+import { randomUUID } from 'node:crypto';
 import { afterEach, describe, expect, it } from 'vitest';
-import type { AccountStatus, CardRecord } from '@meeting-copilot/shared';
-import { AccountError, AuthRequiredError, SupabaseAccount } from '../src/account/SupabaseAccount.js';
+import type { AuthConfigResponse, CardRecord, ConversationListResponse } from '@meeting-copilot/shared';
+import { AuthRequiredError, SupabaseUserDirectory, type AuthenticatedUser, type UserDirectory } from '../src/auth/UserDirectory.js';
 import { HistoryWriter } from '../src/history/HistoryWriter.js';
-import { SupabaseHistoryRepository, toBatchPayload, toCard, toSummary } from '../src/history/SupabaseHistoryRepository.js';
-import type { HistoryRepository } from '../src/history/types.js';
-import { ORIGIN, startApp, type TestApp } from './helpers.js';
+import { SqliteHistoryRepository } from '../src/history/SqliteHistoryRepository.js';
+import { toBatchPayload, toCard, toSummary } from '../src/history/SupabaseHistoryRepository.js';
+import type { ScriptLine } from '../src/transcription/simulated.js';
+import { allSpeculationResolved, connect, ofType, ORIGIN, startApp, type TestApp } from './helpers.js';
 
 const cleanup: Array<() => Promise<void> | void> = [];
 afterEach(async () => {
@@ -28,13 +30,6 @@ const card: CardRecord = {
   firstTokenMs: 120,
   durationMs: 900,
   errorCode: null,
-};
-
-const offlineAccount = () => {
-  // Unroutable URL: these tests must never reach the network.
-  const account = new SupabaseAccount({ url: 'http://127.0.0.1:9', publishableKey: 'sb_publishable_test', sessionPath: ':memory:' });
-  cleanup.push(() => account.close());
-  return account;
 };
 
 describe('Supabase history mapping', () => {
@@ -75,64 +70,141 @@ describe('Supabase history mapping', () => {
   });
 });
 
-describe('Supabase account (offline)', () => {
-  it('requires a signed-in user before any history call', async () => {
-    const repo = new SupabaseHistoryRepository(offlineAccount());
-    await expect(repo.listConversations({ limit: 10 })).rejects.toBeInstanceOf(AuthRequiredError);
-    await expect(repo.applyBatch([{ kind: 'card', value: card }])).rejects.toBeInstanceOf(AuthRequiredError);
-    await expect(repo.deleteAll()).rejects.toBeInstanceOf(AuthRequiredError);
-  });
-
-  it('reports a signed-out status and validates credentials before calling Supabase', async () => {
-    const account = offlineAccount();
-    expect(await account.status()).toMatchObject({ backend: 'supabase', configured: true, signedIn: false, email: null });
-    await expect(account.signIn('not-an-email', 'longenough')).rejects.toBeInstanceOf(AccountError);
-    await expect(account.signUp('a@b.co', 'short')).rejects.toMatchObject({ code: 'bad_request' });
+describe('SupabaseUserDirectory', () => {
+  it('rejects missing, oversized and malformed tokens', async () => {
+    const dir = new SupabaseUserDirectory({ url: 'http://127.0.0.1:9', publishableKey: 'sb_publishable_test' });
+    cleanup.push(() => dir.close());
+    await expect(dir.authenticate(null)).rejects.toBeInstanceOf(AuthRequiredError);
+    await expect(dir.authenticate('x'.repeat(5000))).rejects.toBeInstanceOf(AuthRequiredError);
+    await expect(dir.authenticate('not-a-jwt')).rejects.toBeInstanceOf(AuthRequiredError);
   });
 });
 
-describe('account and history HTTP API with the Supabase backend', () => {
-  const launch = async (opts: { history?: HistoryWriter | null; account?: SupabaseAccount | null } = {}): Promise<TestApp> => {
-    const app = await startApp({ script: [], history: opts.history ?? null, account: opts.account ?? null });
-    cleanup.push(() => app.close());
-    return app;
+/** Two fake users, each with their own in-memory database: stands in for Supabase Auth + RLS. */
+class FakeUsers implements UserDirectory {
+  readonly writers = new Map<string, HistoryWriter>();
+  private readonly tokens: Record<string, AuthenticatedUser> = {
+    'token-alice': { userId: 'alice', email: 'alice@example.com', expiresAt: Date.now() + 3_600_000 },
+    'token-bob': { userId: 'bob', email: 'bob@example.com', expiresAt: Date.now() + 3_600_000 },
   };
-  const api = (app: TestApp, p: string, init: RequestInit = {}) =>
-    fetch(`http://${app.baseUrl}${p}`, { ...init, headers: { Origin: ORIGIN, 'Content-Type': 'application/json', ...(init.headers ?? {}) } });
+  async authenticate(token: string | null | undefined): Promise<AuthenticatedUser> {
+    const user = token ? this.tokens[token] : undefined;
+    if (!user) throw new AuthRequiredError();
+    return user;
+  }
+  writerFor(user: AuthenticatedUser): HistoryWriter {
+    let w = this.writers.get(user.userId);
+    if (!w) {
+      w = new HistoryWriter(new SqliteHistoryRepository(':memory:'), { debounceMs: 10 });
+      this.writers.set(user.userId, w);
+    }
+    return w;
+  }
+  async close(): Promise<void> {
+    for (const w of this.writers.values()) await w.close();
+  }
+}
 
-  it('reports the SQLite backend (no account) and refuses sign-in there', async () => {
-    const app = await launch();
-    const status = (await (await api(app, '/api/account')).json()) as AccountStatus;
-    expect(status).toMatchObject({ backend: 'sqlite', configured: false, signedIn: false });
-    const res = await api(app, '/api/account/sign-in', { method: 'POST', body: JSON.stringify({ email: 'a@b.co', password: 'password1' }) });
-    expect(res.status).toBe(409);
+const script: ScriptLine[] = [{ text: 'What is the difference between TCP and UDP?', speechFinal: true, gapMs: 30 }];
+
+describe('hosted multi-user server', () => {
+  const launch = async (authRequired = true) => {
+    const users = new FakeUsers();
+    const app = await startApp({ script, speed: 2, users, config: { authRequired } });
+    cleanup.push(async () => {
+      await app.close();
+      await users.close();
+    });
+    return { app, users };
+  };
+  const api = (app: TestApp, p: string, token?: string, init: RequestInit = {}) =>
+    fetch(`http://${app.baseUrl}${p}`, {
+      ...init,
+      headers: { Origin: ORIGIN, 'Content-Type': 'application/json', ...(token ? { Authorization: `Bearer ${token}` } : {}), ...(init.headers ?? {}) },
+    });
+
+  it('publishes the public sign-in settings', async () => {
+    const { app } = await launch();
+    const cfg = (await (await api(app, '/api/auth/config')).json()) as AuthConfigResponse;
+    expect(cfg).toEqual({ backend: 'supabase', authRequired: true, supabaseUrl: 'https://example.supabase.co', supabasePublishableKey: 'sb_publishable_test' });
   });
 
-  it('answers history requests with 401 auth_required until the user signs in', async () => {
-    const account = offlineAccount();
-    const writer = new HistoryWriter(new SupabaseHistoryRepository(account), { debounceMs: 10 });
-    cleanup.push(() => writer.close().catch(() => undefined));
-    const app = await launch({ history: writer, account });
-
-    const list = await api(app, '/api/history');
-    expect(list.status).toBe(401);
-    expect(((await list.json()) as { error: { code: string } }).error.code).toBe('auth_required');
-
-    const status = (await (await api(app, '/api/account')).json()) as AccountStatus;
-    expect(status).toMatchObject({ backend: 'supabase', configured: true, signedIn: false });
-
-    const bad = await api(app, '/api/account/sign-in', { method: 'POST', body: JSON.stringify({ email: 'nope', password: 'password1' }) });
-    expect(bad.status).toBe(400);
+  it('requires a valid token for history and paid endpoints', async () => {
+    const { app } = await launch();
+    for (const [p, init] of [
+      ['/api/history', {}],
+      ['/api/insights', { method: 'POST', body: JSON.stringify({ kind: 'summary', transcript: 'hello' }) }],
+      ['/api/resume/extract', { method: 'POST', body: 'x' }],
+    ] as const) {
+      const res = await api(app, p, undefined, init);
+      expect(res.status, p).toBe(401);
+      expect(((await res.json()) as { error: { code: string } }).error.code).toBe('auth_required');
+      expect((await api(app, p, 'token-forged', init)).status, p).toBe(401);
+    }
+    expect((await api(app, '/api/history', 'token-alice')).status).toBe(200);
   });
 
-  it('rejects account calls from web pages (origin check)', async () => {
-    const app = await launch();
-    const res = await fetch(`http://${app.baseUrl}/api/account`, { headers: { Origin: 'https://evil.example' } });
+  it('allows the Authorization header in CORS preflight', async () => {
+    const { app } = await launch();
+    const res = await api(app, '/api/history', undefined, { method: 'OPTIONS' });
+    expect(res.headers.get('access-control-allow-headers')).toMatch(/Authorization/);
+  });
+
+  it('refuses a WebSocket session without a valid sign-in', async () => {
+    const { app } = await launch();
+    for (const token of [undefined, 'token-forged']) {
+      const c = await connect(app.baseUrl);
+      const closed = new Promise<number>((r) => c.ws.on('close', (code) => r(code)));
+      c.start({}, 'simulation', token);
+      await c.waitFor((e) => ofType(e, 'session.error').some((x) => x.code === 'auth_required' && x.fatal));
+      expect(await closed).toBe(1008);
+    }
+  });
+
+  it('saves each user’s session under their own account only', async () => {
+    const { app } = await launch();
+    const conversationId = randomUUID();
+    const c = await connect(app.baseUrl);
+    c.start({ conversationId }, 'simulation', 'token-alice');
+    await c.waitFor((e) => ofType(e, 'answer.completed').length >= 1 && allSpeculationResolved(e), 15_000);
+    // A refreshed token for the same user is accepted mid-session; another user's is refused.
+    c.ws.send(JSON.stringify({ type: 'auth.update', accessToken: 'token-alice', ts: Date.now() }));
+    c.ws.close();
+
+    const alice = (await (await api(app, '/api/history', 'token-alice')).json()) as ConversationListResponse;
+    expect(alice.backend).toBe('supabase');
+    expect(alice.conversations.map((x) => x.id)).toEqual([conversationId]);
+    expect(alice.conversations[0]?.cardCount).toBe(1);
+
+    const bob = (await (await api(app, '/api/history', 'token-bob')).json()) as ConversationListResponse;
+    expect(bob.conversations).toEqual([]);
+    expect((await api(app, `/api/history/${conversationId}`, 'token-bob')).status).toBe(404);
+    expect((await api(app, `/api/history/${conversationId}`, 'token-bob', { method: 'DELETE' })).status).toBe(404);
+    expect((await api(app, `/api/history/${conversationId}`, 'token-alice')).status).toBe(200);
+  });
+
+  it('closes the session if a different account’s token arrives mid-session', async () => {
+    const { app } = await launch();
+    const c = await connect(app.baseUrl);
+    const closed = new Promise<number>((r) => c.ws.on('close', (code) => r(code)));
+    c.start({ conversationId: randomUUID() }, 'simulation', 'token-alice');
+    await c.waitFor((e) => ofType(e, 'session.ready').length >= 1);
+    c.ws.send(JSON.stringify({ type: 'auth.update', accessToken: 'token-bob', ts: Date.now() }));
+    expect(await closed).toBe(1008);
+  });
+
+  it('lets anonymous sessions run when accounts are optional (AUTH_REQUIRED=false)', async () => {
+    const { app } = await launch(false);
+    const c = await connect(app.baseUrl);
+    c.start({}, 'simulation');
+    await c.waitFor((e) => ofType(e, 'session.ready').length >= 1);
+    c.ws.close();
+    expect((await api(app, '/api/insights', undefined, { method: 'POST', body: JSON.stringify({ kind: 'x', transcript: '' }) })).status).toBe(400);
+  });
+
+  it('rejects calls from web pages (origin check)', async () => {
+    const { app } = await launch();
+    const res = await fetch(`http://${app.baseUrl}/api/auth/config`, { headers: { Origin: 'https://evil.example' } });
     expect(res.status).toBe(403);
-  });
-
-  it('keeps the HistoryRepository contract', () => {
-    const repo: HistoryRepository = new SupabaseHistoryRepository(offlineAccount());
-    expect(typeof repo.applyBatch).toBe('function');
   });
 });

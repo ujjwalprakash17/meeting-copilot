@@ -43,17 +43,14 @@ export interface ConversationListResponse {
   backend?: HistoryBackend;
 }
 
-/** GET /api/account: the Supabase user signed in on the local server. Never contains tokens. */
-export interface AccountStatus {
+/** GET /api/auth/config: how the extension should sign users in. Public values only (no secrets). */
+export interface AuthConfigResponse {
   backend: HistoryBackend;
-  /** True when the server is set up for Supabase (HISTORY_BACKEND=supabase with URL and key). */
-  configured: boolean;
-  signedIn: boolean;
-  email: string | null;
-  userId: string | null;
-  projectUrl: string | null;
-  /** Sign-up only: the user must open the confirmation email before signing in. */
-  needsConfirmation?: boolean;
+  /** True when this server requires a signed-in user for sessions and API calls. */
+  authRequired: boolean;
+  /** Supabase project URL and publishable key; null for servers without accounts. */
+  supabaseUrl: string | null;
+  supabasePublishableKey: string | null;
 }
 
 export interface ConversationDetailResponse {

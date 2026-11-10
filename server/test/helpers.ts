@@ -1,4 +1,4 @@
-import type { SupabaseAccount } from '../src/account/SupabaseAccount.js';
+import type { UserDirectory } from '../src/auth/UserDirectory.js';
 import type { AddressInfo } from 'node:net';
 import WebSocket from 'ws';
 import { AUDIO_FORMAT, DEFAULT_SESSION_CONFIG, parseServerEvent, type ServerEvent, type SessionConfig } from '@meeting-copilot/shared';
@@ -42,8 +42,8 @@ export async function startApp(opts: {
   speed?: number;
   llm?: LlmProvider;
   history?: HistoryWriter | null;
-  /** Supabase account (HISTORY_BACKEND=supabase); omitted = SQLite backend. */
-  account?: SupabaseAccount | null;
+  /** Multi-user directory (HISTORY_BACKEND=supabase); omitted = single-user SQLite backend. */
+  users?: UserDirectory | null;
   config?: Partial<ServerConfig>;
   /** Replaces the live transcriber (e.g. a replay of recorded Deepgram responses). */
   liveStt?: SttProvider;
@@ -56,8 +56,9 @@ export async function startApp(opts: {
     simulatedStt: new SimulatedSttProvider(opts.speed ?? 1, opts.script),
     llm: opts.llm ?? new MockLlmProvider(2),
     history: opts.history ?? null,
-    historyBackend: opts.account ? 'supabase' : 'sqlite',
-    account: opts.account ?? null,
+    historyBackend: opts.users ? 'supabase' : 'sqlite',
+    users: opts.users ?? null,
+    supabase: opts.users ? { url: 'https://example.supabase.co', publishableKey: 'sb_publishable_test' } : null,
     tracker,
   });
   await new Promise<void>((r) => server.listen(0, '127.0.0.1', r));
@@ -98,8 +99,18 @@ export async function connect(baseUrl: string) {
         pred(events()) ? res() : Date.now() - started > ms ? rej(new Error(`timeout; got ${events().map((e) => e.type).join(',')}`)) : setTimeout(tick, 5);
       tick();
     });
-  const start = (config: Partial<SessionConfig> = {}, mode: 'live' | 'simulation' = 'simulation') =>
-    ws.send(JSON.stringify({ type: 'audio.start', sessionId: 'test', mode, audio: AUDIO_FORMAT, config: { ...DEFAULT_SESSION_CONFIG, ...config }, ts: Date.now() }));
+  const start = (config: Partial<SessionConfig> = {}, mode: 'live' | 'simulation' = 'simulation', accessToken?: string) =>
+    ws.send(
+      JSON.stringify({
+        type: 'audio.start',
+        sessionId: 'test',
+        mode,
+        audio: AUDIO_FORMAT,
+        config: { ...DEFAULT_SESSION_CONFIG, ...config },
+        ...(accessToken ? { accessToken } : {}),
+        ts: Date.now(),
+      }),
+    );
   return { ws, received, events, waitFor, start };
 }
 

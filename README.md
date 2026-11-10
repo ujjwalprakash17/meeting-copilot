@@ -27,6 +27,7 @@ Suggestions are drafts for you to review. Nothing is spoken or typed into the me
 11. [Latency](#latency)
 12. [Conversation history (SQLite)](#conversation-history-sqlite)
     - [Shared history in Supabase (multi-user)](#shared-history-in-supabase-multi-user)
+    - [Hosted deployment (Render)](#hosted-deployment-render)
 13. [Transcription and speaker labels](#transcription-and-speaker-labels)
 14. [Screen sharing: what others can see](#screen-sharing-what-others-can-see)
 15. [Testing](#testing)
@@ -178,7 +179,9 @@ See `.env.example` for the full list with comments. Put them in `server/.env` (t
 | `CONTEXT_MEMORY` | Experimental conversation context for follow-ups ([details](#conversation-context)); `false` behaves exactly as without the feature | `false` |
 | `HISTORY_ENABLED`, `HISTORY_DB_PATH` | Conversation history database ([details](#conversation-history-sqlite)) | `true`, `server/data/history.sqlite` |
 | `HISTORY_BACKEND` | `sqlite` (this machine only) or `supabase` (shared, per-user accounts; [details](#shared-history-in-supabase-multi-user)) | `sqlite` |
-| `SUPABASE_URL`, `SUPABASE_PUBLISHABLE_KEY`, `SUPABASE_SESSION_PATH` | Supabase project URL, **publishable** key (never the secret key), signed-in session file | unset, unset, `server/data/supabase-session.json` |
+| `SUPABASE_URL`, `SUPABASE_PUBLISHABLE_KEY` | Supabase project URL and **publishable** key (never the secret key) | unset |
+| `AUTH_REQUIRED` | Require a signed-in user for sessions, resume upload and insights | `true` with `HISTORY_BACKEND=supabase` |
+| `PUBLIC_URL` | Public URL when hosted (Render sets `RENDER_EXTERNAL_URL`) | unset |
 | `HOST`, `PORT` | Bind address | `127.0.0.1`, `8787` |
 | `ALLOWED_EXTENSION_IDS` | Restrict connections to your extension ID(s) | empty = any extension origin |
 | `LOG_LEVEL`, `LOG_TRANSCRIPTS` | Logging; transcripts are not logged unless enabled | `info`, `false` |
@@ -668,25 +671,39 @@ The persistence layer is the `HistoryRepository` interface in `server/src/histor
 
 ### Shared history in Supabase (multi-user)
 
-Set `HISTORY_BACKEND=supabase` to store history in a hosted Supabase Postgres database instead of the local SQLite file. Every user then signs in with their own account and sees only their own conversations, from any computer.
+Set `HISTORY_BACKEND=supabase` to store history in a hosted Supabase Postgres database instead of the local SQLite file. This is what the hosted server uses: every user has their own account and only sees their own conversations.
 
 **How it works**
-- Each user still runs their own server; that server signs in to Supabase as that user (Settings → **Account** in the extension) and keeps the session in `server/data/supabase-session.json` (git-ignored, refreshed automatically).
-- All queries use the **publishable** key plus the user's access token. Postgres **Row Level Security** limits every read and write to rows whose `user_id` is the signed-in user. The secret / service-role key is never used and must never be put in `.env`: every user's machine has a copy of that file.
-- Until someone signs in, the History tab shows "Sign in…", and live answers keep working (history writes just fail with a notice).
-- The SQLite backend stays available: set `HISTORY_BACKEND=sqlite` to go back.
+- Users sign in **inside the extension** (Settings → **Account**) with Supabase Auth. The session lives in `chrome.storage.local`; the password never reaches the Meeting Copilot server.
+- Every HTTP call carries `Authorization: Bearer <access token>`; WebSocket sessions send the token in `audio.start` and refresh it with `auth.update` every 10 minutes. The server verifies the token (`auth.getClaims`) and then reads and writes **as that user** (publishable key + the user's token). Postgres **Row Level Security** limits every query to rows whose `user_id` is that user. No service-role key is used anywhere.
+- With `AUTH_REQUIRED=true` (default for the Supabase backend) sessions, resume upload and insights are refused until the user signs in; a session cannot switch accounts mid-way.
+- The SQLite backend stays available for single-user local use (`HISTORY_BACKEND=sqlite`).
 
 **Schema:** `supabase/migrations/20261110000000_history.sql`: tables `conversations` and `cards` keyed by `(user_id, id)`, a `conversation_summaries` view (security invoker), and two functions: `apply_history_batch` (one-transaction upsert where an older card never overwrites a newer one) and `delete_all_history`. Anonymous access is revoked. Apply it with the Supabase SQL editor or `supabase db push`.
 
-**Set up a new project**
-1. Create a Supabase project and run the migration SQL above.
-2. Authentication → URL Configuration: Site URL `http://127.0.0.1:8787/auth/confirmed`, and add `http://127.0.0.1:8787/**` to Redirect URLs (the sign-up confirmation link lands on that local page).
-3. In `server/.env`: `HISTORY_BACKEND=supabase`, `SUPABASE_URL=https://<ref>.supabase.co`, `SUPABASE_PUBLISHABLE_KEY=sb_publishable_…` (Project Settings → API Keys).
-4. Restart the server, open Settings → Account, create an account, confirm the email, sign in.
+**Supabase project settings:** Authentication → URL Configuration: Site URL `https://<your-server>/auth/confirmed`, and add `https://<your-server>/**` (plus `http://127.0.0.1:8787/**` for local development) to Redirect URLs. The sign-up confirmation link lands on that page.
 
-**Move existing local history:** sign in once from the extension, stop the server, then run `npm run history:import -w server` (`-- --dry-run` to only count). It upserts, so re-running is safe, and the SQLite file is left untouched.
+**Move existing local history:** `npm run history:import -w server` (`-- --dry-run` to only count). It asks for your account email and password, upserts (safe to re-run) and leaves the SQLite file untouched.
 
 **Limits to know:** Supabase's built-in email sender is rate-limited (a few sign-up emails per hour) and meant for testing; for more users configure custom SMTP under Authentication → Emails. The Free plan pauses a project after a week without activity.
+
+## Hosted deployment (Render)
+
+The server runs on [Render](https://render.com) as one Node web service (`render.yaml` Blueprint): Express + WebSocket on one port, no connection time limit. Vercel was ruled out because Functions close WebSocket connections after 5–30 minutes, which would cut meetings.
+
+- **Region:** Singapore (closest Render region to the Supabase project in Mumbai). **Plan:** free (sleeps after 15 min without traffic; first request then waits ~1 min). Switch `plan: starter` for always-on.
+- **Deploys:** every push to the linked branch redeploys. Health check: `GET /health`. On shutdown, queued history is flushed.
+- **Environment:** set in `render.yaml`, except the shared provider keys `DEEPGRAM_API_KEY` and `GROQ_API_KEY`, which are entered in the Render dashboard (Environment) and never committed. Every user's transcription and answers use these keys.
+- **Who can call it:** only the Meeting Copilot extension. The manifest has a fixed `key`, so the extension ID is always `dlfbnoebakjbphpgkakhjjhjaicbameh`, and `ALLOWED_EXTENSION_IDS` is set to it.
+
+**Build the extension for users** (the hosted URL becomes the default server):
+
+```bash
+VITE_DEFAULT_SERVER_URL=https://meeting-copilot-server.onrender.com npm run build -w extension
+# zip extension/dist and share it; users: chrome://extensions → Developer mode → Load unpacked → the unzipped folder
+```
+
+Users then open the assistant window → Settings → Account, create an account, confirm their email and sign in. Existing users can point Settings → Local server URL at the hosted URL.
 
 ## Transcription and speaker labels
 

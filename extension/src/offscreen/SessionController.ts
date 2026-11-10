@@ -27,9 +27,13 @@ export interface StartOptions {
   config: SessionConfig;
   tabId: number | null;
   tabTitle: string | null;
+  /** Signed-in user's access token; refreshed through the service worker during the session. */
+  accessToken?: string | null;
 }
 
-const READY_TIMEOUT_MS = 10_000;
+const READY_TIMEOUT_MS = 15_000;
+/** Access tokens last about an hour: refresh well before that. */
+const TOKEN_REFRESH_MS = 10 * 60_000;
 /** Traffic summary interval (DEBUG): counts only, never content. */
 const SUMMARY_INTERVAL_MS = 30_000;
 
@@ -49,12 +53,15 @@ export class SessionController {
   private readonly startedAt = monotonicNow();
   private readonly eventCounts = new Map<string, number>();
   private summaryTimer: ReturnType<typeof setInterval> | null = null;
+  private tokenTimer: ReturnType<typeof setInterval> | null = null;
+  private accessToken: string | null;
 
   constructor(
     private readonly opts: StartOptions,
     previous: CopilotState | null,
   ) {
     this.config = opts.config;
+    this.accessToken = opts.accessToken ?? null;
     // Continue the visible history from an earlier session in this browser session.
     this.state = previous ? { ...settleGenerating(previous), ended: false, lastNotice: null } : initialCopilotState();
     this.status = { phase: 'starting', mode: opts.mode, tabId: opts.tabId, tabTitle: opts.tabTitle, startedAt: Date.now(), message: null };
@@ -136,6 +143,7 @@ export class SessionController {
       mode: this.opts.mode,
       audio: { encoding: AUDIO_FORMAT.encoding, sampleRate: AUDIO_FORMAT.sampleRate, channels: AUDIO_FORMAT.channels },
       config: this.config,
+      ...(this.accessToken ? { accessToken: this.accessToken } : {}),
       ...(continuation ? { continuation } : {}),
       ts: Date.now(),
     });
@@ -180,10 +188,27 @@ export class SessionController {
       }
       this.setStatus({ phase: 'live', message: null });
       this.summaryTimer = setInterval(() => this.logSummary('traffic'), SUMMARY_INTERVAL_MS);
+      if (this.accessToken) this.tokenTimer = setInterval(() => void this.refreshToken(), TOKEN_REFRESH_MS);
     } catch (err) {
       this.log.error('start_failed', { stage, err, duration_ms: elapsedMs(this.startedAt), recovery: 'session_stopped' });
       await this.stop((err as Error).message);
       throw err;
+    }
+  }
+
+  /** Gets a fresh token from the service worker and hands it to the server (keeps history saving after 1 h). */
+  private async refreshToken(): Promise<void> {
+    try {
+      const res = (await chrome.runtime.sendMessage({ type: 'copilot.getAccessToken', serverUrl: this.opts.serverUrl })) as { token: string | null } | undefined;
+      if (!res?.token) {
+        this.log.warn('token_refresh_failed', { reason: 'signed_out_or_offline' });
+        return;
+      }
+      this.accessToken = res.token;
+      this.connection?.sendEvent({ type: 'auth.update', accessToken: res.token, ts: Date.now() });
+      this.log.debug('token_refreshed');
+    } catch (err) {
+      this.log.warn('token_refresh_failed', { err });
     }
   }
 
@@ -229,6 +254,7 @@ export class SessionController {
     if (this.stopping) return;
     this.stopping = true;
     if (this.summaryTimer) clearInterval(this.summaryTimer);
+    if (this.tokenTimer) clearInterval(this.tokenTimer);
     (reason ? this.log.warn : this.log.info)('stopping', { reason: reason ?? 'user' });
     this.setStatus({ phase: 'stopping', message: null });
 

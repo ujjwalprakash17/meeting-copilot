@@ -2,8 +2,7 @@ import { createApp } from './app.js';
 import { loadConfig, type ServerConfig } from './config.js';
 import { HistoryWriter } from './history/HistoryWriter.js';
 import { SqliteHistoryRepository } from './history/SqliteHistoryRepository.js';
-import { SupabaseHistoryRepository } from './history/SupabaseHistoryRepository.js';
-import { SupabaseAccount } from './account/SupabaseAccount.js';
+import { SupabaseUserDirectory } from './auth/UserDirectory.js';
 import { GroqProvider } from './llm/groq.js';
 import { MockLlmProvider } from './llm/mock.js';
 import type { LlmProvider } from './llm/types.js';
@@ -62,7 +61,8 @@ if (config.llm.provider === 'mock') {
 const dbLog = log.child('history-db');
 let history: HistoryWriter | null = null;
 let historyError: string | null = null;
-let account: SupabaseAccount | null = null;
+let users: SupabaseUserDirectory | null = null;
+let supabasePublic: { url: string; publishableKey: string } | null = null;
 const historyConfig = config.history ?? { enabled: true, dbPath: '' };
 const historyBackend = historyConfig.backend ?? 'sqlite';
 if (!historyConfig.enabled) {
@@ -71,17 +71,13 @@ if (!historyConfig.enabled) {
 } else if (historyBackend === 'supabase') {
   const sb = historyConfig.supabase;
   if (!sb?.url || !sb.publishableKey) {
-    historyError = 'HISTORY_BACKEND=supabase needs SUPABASE_URL and SUPABASE_PUBLISHABLE_KEY in server/.env.';
+    historyError = 'HISTORY_BACKEND=supabase needs SUPABASE_URL and SUPABASE_PUBLISHABLE_KEY.';
     dbLog.error('supabase_not_configured', { recovery: 'history_disabled_copilot_continues' });
   } else {
-    try {
-      account = new SupabaseAccount({ url: sb.url, publishableKey: sb.publishableKey, sessionPath: sb.sessionPath });
-      history = new HistoryWriter(new SupabaseHistoryRepository(account), { debounceMs: 600, maxDelayMs: 3_000 });
-      dbLog.info('opened', { backend: 'supabase', url: sb.url });
-    } catch (err) {
-      historyError = `Supabase history unavailable: ${(err as Error).message}`;
-      dbLog.error('open_failed', { backend: 'supabase', err, recovery: 'history_disabled_copilot_continues' });
-    }
+    // Multi-user: each signed-in user gets their own writer, acting with their own access token.
+    supabasePublic = { url: sb.url, publishableKey: sb.publishableKey };
+    users = new SupabaseUserDirectory(supabasePublic);
+    dbLog.info('opened', { backend: 'supabase', url: sb.url, auth_required: Boolean(config.authRequired) });
   }
 } else {
   try {
@@ -103,7 +99,8 @@ const { server, wss } = createApp({
   historyError,
   historyDbPath: history && historyBackend === 'sqlite' ? historyConfig.dbPath : null,
   historyBackend,
-  account,
+  users,
+  supabase: supabasePublic,
 });
 
 const onListenError = (err: NodeJS.ErrnoException) => {
@@ -127,7 +124,9 @@ server.listen(config.port, config.host, () => {
     llm: `${llm.name}/${llm.model}`,
     llm_configured: llm.isConfigured(),
     detection_model: config.llm.groqDetectionModel ?? 'off',
-    history: history ? historyBackend : 'off',
+    history: history || users ? historyBackend : 'off',
+    auth_required: Boolean(config.authRequired && users),
+    public_url: config.publicUrl ?? undefined,
     allowed_extensions: config.allowedExtensionIds.length || 'any',
   });
   if (!liveStt.isConfigured()) serverLog.warn('stt_not_configured', { hint: 'set DEEPGRAM_API_KEY in server/.env (Simulation mode still works)' });
@@ -139,7 +138,7 @@ const shutdown = (signal: string) => {
   serverLog.info('shutting_down', { signal });
   setTimeout(() => process.exit(0), 3_000).unref();
   // Write any queued history before exiting.
-  void (history?.close() ?? Promise.resolve())
+  void Promise.all([history?.close() ?? Promise.resolve(), users?.close() ?? Promise.resolve()])
     .catch((err: unknown) => dbLog.error('flush_on_shutdown_failed', { err }))
     .finally(() => server.close(() => process.exit(0)));
 };

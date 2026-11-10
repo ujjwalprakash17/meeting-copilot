@@ -48,6 +48,10 @@ export interface ServerConfig {
   history?: HistoryConfig;
   /** Session-scoped conversation memory for context-aware answers (CONTEXT_MEMORY, default off). */
   contextMemory?: boolean;
+  /** Require a signed-in Supabase user for sessions and paid API calls (default: on with HISTORY_BACKEND=supabase). */
+  authRequired?: boolean;
+  /** Public base URL when hosted (e.g. https://meeting-copilot.onrender.com); used for email confirmation links. */
+  publicUrl?: string | null;
 }
 
 export interface LatencyConfig {
@@ -75,8 +79,6 @@ export interface SupabaseConfig {
   url: string | null;
   /** Publishable (anon) key. Safe to ship: Row Level Security limits each signed-in user to their own rows. */
   publishableKey: string | null;
-  /** Local file that keeps the signed-in user's Supabase session (refresh token) between restarts. */
-  sessionPath: string;
 }
 
 export const DEFAULT_LATENCY: LatencyConfig = { speculative: true, speculationMinScore: 2, classifierTimeoutMs: 1_500, continuationWindowMs: 2_000 };
@@ -113,7 +115,8 @@ export function loadConfig(): ServerConfig {
   if (!['debug', 'info', 'warn', 'error'].includes(logLevel)) throw new Error(`LOG_LEVEL must be debug, info, warn or error (got "${logLevel}")`);
 
   return {
-    host: str('HOST') ?? '127.0.0.1',
+    // Hosting platforms (Render, Railway, Fly) set PORT and need the server to listen on all interfaces.
+    host: str('HOST') ?? (process.env.RENDER ? '0.0.0.0' : '127.0.0.1'),
     port: num('PORT', 8787),
     allowedExtensionIds: (str('ALLOWED_EXTENSION_IDS') ?? '')
       .split(',')
@@ -166,8 +169,9 @@ export function loadConfig(): ServerConfig {
       supabase: {
         url: str('SUPABASE_URL'),
         publishableKey: secret('SUPABASE_PUBLISHABLE_KEY') ?? secret('SUPABASE_ANON_KEY'),
-        sessionPath: path.resolve(str('SUPABASE_SESSION_PATH') ?? path.resolve(here, '../data/supabase-session.json')),
       },
     },
+    authRequired: process.env.AUTH_REQUIRED === undefined ? (str('HISTORY_BACKEND') ?? 'sqlite').toLowerCase() === 'supabase' : bool('AUTH_REQUIRED', false),
+    publicUrl: (str('PUBLIC_URL') ?? str('RENDER_EXTERNAL_URL'))?.replace(/\/+$/, '') ?? null,
   };
 }

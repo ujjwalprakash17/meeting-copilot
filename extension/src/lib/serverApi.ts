@@ -1,11 +1,11 @@
 /** HTTP calls to the local Meeting Copilot server. Provider keys never pass through the extension. */
 import { extensionLog } from './log.js';
+import { getAccessToken } from './auth.js';
 import {
   elapsedMs,
   monotonicNow,
   LIMITS,
   RESUME_FILE_TYPES,
-  type AccountStatus,
   type ApiErrorBody,
   type ConversationDetailResponse,
   type ConversationListResponse,
@@ -17,6 +17,7 @@ export interface ServerStatus {
   llm: { provider: string; model: string; configured: boolean; simulated: boolean; verified: boolean | null; message: string };
   detectionModel: string | null;
   history?: { enabled: boolean; error: string | null; backend?: 'sqlite' | 'supabase' };
+  authRequired?: boolean;
 }
 
 export class ApiError extends Error {
@@ -36,15 +37,19 @@ async function request<T>(serverUrl: string, path: string, init: RequestInit & {
   const controller = new AbortController();
   const timer = setTimeout(() => controller.abort(), init.timeoutMs ?? 15_000);
   let res: Response;
+  // Signed-in user's token (hosted servers require it; local servers ignore it).
+  const token = await getAccessToken(serverUrl);
+  const headers = new Headers(init.headers);
+  if (token) headers.set('Authorization', `Bearer ${token}`);
   try {
-    res = await fetch(new URL(path, serverUrl), { ...init, signal: controller.signal });
+    res = await fetch(new URL(path, serverUrl), { ...init, headers, signal: controller.signal });
   } catch (err) {
     log.error('request_failed', { op, kind: (err as Error).name === 'AbortError' ? 'timeout' : 'network', err, duration_ms: elapsedMs(t0) });
     throw new ApiError(
       'network',
       (err as Error).name === 'AbortError'
-        ? 'The local server did not respond in time.'
-        : `Cannot reach the Meeting Copilot server at ${serverUrl}. Is it running (npm run dev:server)?`,
+        ? 'The server did not respond in time.'
+        : `Cannot reach the Meeting Copilot server at ${serverUrl}. Check your connection and the server URL in Settings.`,
     );
   } finally {
     clearTimeout(timer);
@@ -80,25 +85,6 @@ export async function extractResume(serverUrl: string, file: File): Promise<Resu
     timeoutMs: 30_000,
   });
 }
-
-// ---------------------------------------------------------------------------
-// Account (Supabase Auth, used when the server stores history in Supabase)
-// The password goes to the local server, which passes it to Supabase Auth and keeps only the session.
-// ---------------------------------------------------------------------------
-
-export const fetchAccount = (serverUrl: string) => request<AccountStatus>(serverUrl, '/api/account', { timeoutMs: 10_000 });
-
-const credentialsRequest = (serverUrl: string, path: string, email: string, password: string) =>
-  request<AccountStatus>(serverUrl, path, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ email, password }),
-    timeoutMs: 20_000,
-  });
-
-export const signIn = (serverUrl: string, email: string, password: string) => credentialsRequest(serverUrl, '/api/account/sign-in', email, password);
-export const signUp = (serverUrl: string, email: string, password: string) => credentialsRequest(serverUrl, '/api/account/sign-up', email, password);
-export const signOut = (serverUrl: string) => request<AccountStatus>(serverUrl, '/api/account/sign-out', { method: 'POST', timeoutMs: 10_000 });
 
 // ---------------------------------------------------------------------------
 // Conversation history (stored by the server in local SQLite or in Supabase)

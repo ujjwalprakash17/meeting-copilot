@@ -63,11 +63,15 @@ export class ServerConnection {
       }
       if (!this.everOpened && !opened) {
         this.log.error('connect_failed', { ...fields, duration_ms: elapsedMs(t0), recovery: 'session_stopped' });
-        return this.cb.onClosed(`Cannot connect to the Meeting Copilot server at ${this.url}. Start it with "npm run dev:server" and check the server URL in Settings.`);
+        return this.cb.onClosed(`Cannot connect to the Meeting Copilot server at ${this.url}. Check your internet connection and the server URL in Settings (a sleeping free server can take up to a minute to wake: try again).`);
       }
       if (e.code === 1008 || e.code === 1009) {
         this.log.error('closed_by_server', { ...fields, recovery: 'session_stopped' });
-        return this.cb.onClosed(`The server closed the connection (${e.reason || `code ${e.code}`}).`);
+        return this.cb.onClosed(
+          e.reason === 'Sign in required'
+            ? 'Sign in first: open the assistant window → Settings → Account.'
+            : `The server closed the connection (${e.reason || `code ${e.code}`}).`,
+        );
       }
       if (this.attempts >= MAX_RECONNECTS) {
         this.log.error('reconnect_gave_up', { ...fields, attempts: this.attempts, recovery: 'session_stopped' });

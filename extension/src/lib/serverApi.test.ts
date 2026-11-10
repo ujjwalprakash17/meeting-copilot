@@ -2,6 +2,9 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { ApiError, fetchServerStatus, listConversations } from './serverApi';
 
+// Signed-out user: no Authorization header (auth itself is covered by the server tests).
+vi.mock('./auth.js', () => ({ getAccessToken: async () => null }));
+
 let lines: string[];
 beforeEach(() => {
   lines = [];
@@ -16,12 +19,12 @@ afterEach(() => {
 const caught = (p: Promise<unknown>) => p.then(() => null, (e: unknown) => e as ApiError);
 
 describe('serverApi request errors', () => {
-  it('reports an unreachable server with how to start it, logged as ERROR network', async () => {
+  it('reports an unreachable server with what to check, logged as ERROR network', async () => {
     vi.stubGlobal('fetch', vi.fn().mockRejectedValue(new TypeError('Failed to fetch')));
     const err = await caught(fetchServerStatus('http://localhost:8790'));
     expect(err).toBeInstanceOf(ApiError);
     expect(err?.code).toBe('network');
-    expect(err?.message).toBe('Cannot reach the Meeting Copilot server at http://localhost:8790. Is it running (npm run dev:server)?');
+    expect(err?.message).toBe('Cannot reach the Meeting Copilot server at http://localhost:8790. Check your connection and the server URL in Settings.');
     expect(lines).toHaveLength(1);
     expect(lines[0]).toMatch(/\[ERROR\] \[server-api\] request_failed op="GET \/api\/status" kind=network .*err.name=TypeError/);
   });
@@ -35,7 +38,7 @@ describe('serverApi request errors', () => {
     const pending = caught(fetchServerStatus('http://localhost:8790'));
     await vi.advanceTimersByTimeAsync(5_000);
     const err = await pending;
-    expect(err?.message).toBe('The local server did not respond in time.');
+    expect(err?.message).toBe('The server did not respond in time.');
     expect(lines[0]).toMatch(/\[ERROR\] \[server-api\] request_failed .*kind=timeout/);
   });
 
@@ -54,5 +57,19 @@ describe('serverApi request errors', () => {
     const err = await caught(fetchServerStatus('http://localhost:8790'));
     expect(err?.code).toBe('http_502');
     expect(err?.message).toBe('Server returned HTTP 502');
+  });
+});
+
+describe('serverApi auth', () => {
+  it('sends the signed-in user\u2019s access token as a bearer token', async () => {
+    vi.resetModules();
+    vi.doMock('./auth.js', () => ({ getAccessToken: async () => 'tok-123' }));
+    const api = await import('./serverApi');
+    const fetchMock = vi.fn().mockResolvedValue(new Response(JSON.stringify({ conversations: [], dbPath: null }), { status: 200 }));
+    vi.stubGlobal('fetch', fetchMock);
+    await api.listConversations('https://copilot.example');
+    const init = fetchMock.mock.calls[0]?.[1] as RequestInit;
+    expect(new Headers(init.headers).get('Authorization')).toBe('Bearer tok-123');
+    vi.doUnmock('./auth.js');
   });
 });

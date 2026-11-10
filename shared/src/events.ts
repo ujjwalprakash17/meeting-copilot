@@ -28,6 +28,8 @@ export const AudioStartSchema = z.object({
     channels: z.literal(1),
   }),
   config: SessionConfigSchema,
+  /** Supabase access token of the signed-in user (required by hosted servers). Never forwarded to providers. */
+  accessToken: z.string().min(1).max(4096).optional(),
   /**
    * Sent when the extension reconnects mid-meeting: the new server session continues the transcript
    * timeline (instead of restarting at 0:00) and numbers new speaker labels after the ones already shown,
@@ -83,7 +85,15 @@ export const ConfigUpdateSchema = z.object({
   ts,
 });
 
+/** Sent when the extension refreshes the user's access token during a long session. */
+export const AuthUpdateSchema = z.object({
+  type: z.literal('auth.update'),
+  accessToken: z.string().min(1).max(4096),
+  ts,
+});
+
 export const ClientEventSchema = z.discriminatedUnion('type', [
+  AuthUpdateSchema,
   AudioStartSchema,
   AudioStopSchema,
   AnswerRequestSchema,
@@ -178,6 +188,7 @@ export const ErrorCodeSchema = z.enum([
   'provider_error',
   'audio_rate_exceeded',
   'history_write_failed',
+  'auth_required',
   'internal',
 ]);
 export type ErrorCode = z.infer<typeof ErrorCodeSchema>;

@@ -6,6 +6,7 @@
  * Logs (see lib/log.ts): chrome://extensions -> Meeting Copilot -> "service worker" -> Console.
  */
 import { elapsedMs, monotonicNow, type CopilotState } from '@meeting-copilot/shared';
+import { getAccessToken, getAuthConfig } from '../lib/auth.js';
 import { actionAppearance, actionIconPaths } from '../lib/actionAppearance.js';
 import { openAssistantWindow, type StoredWindowInfo } from '../lib/assistantWindow.js';
 import { chooseAssistantPlacement, type DisplayLike, type Rect } from '../lib/displayPlacement.js';
@@ -202,6 +203,18 @@ async function startSession(msg: Extract<RuntimeMessage, { type: 'copilot.start'
   try {
     const [settings, resume, previous, conversationId] = await Promise.all([getSettings(), getResume(), getHistory(), getConversationId()]);
     await updateStatus({ phase: 'starting', mode: msg.mode, tabId: msg.tabId, tabTitle: msg.tabTitle, startedAt: Date.now(), message: null });
+    stage = 'sign_in';
+    // Hosted servers require an account: check before opening anything so the user gets a clear message.
+    const [authConfig, accessToken] = await Promise.all([
+      getAuthConfig(settings.serverUrl).catch(() => null),
+      getAccessToken(settings.serverUrl),
+    ]);
+    if (authConfig?.authRequired && !accessToken) {
+      const error = 'Sign in first: open the assistant window → Settings → Account.';
+      sessionLog.warn('start_rejected', { reason: 'not_signed_in' });
+      await updateStatus({ ...IDLE_STATUS, phase: 'error', message: error });
+      return { ok: false, error };
+    }
     stage = 'offscreen';
     await ensureOffscreen();
 
@@ -228,6 +241,7 @@ async function startSession(msg: Extract<RuntimeMessage, { type: 'copilot.start'
       config: buildSessionConfig(settings, resume, conversationId),
       tabId: msg.tabId,
       tabTitle: msg.tabTitle,
+      accessToken,
       previous,
       debugLogging: isDebugLogging(),
     } satisfies RuntimeMessage & { previous: CopilotState | null; debugLogging: boolean })) as StartResponse | undefined;
@@ -333,6 +347,10 @@ chrome.runtime.onMessage.addListener((message: RuntimeMessage, sender, sendRespo
     case 'copilot.history':
       void chrome.storage.session.set({ [STORAGE_KEYS.history]: message.state });
       return false;
+    case 'copilot.getAccessToken':
+      // The offscreen document refreshes its token through here during long sessions.
+      void getAccessToken(message.serverUrl).then((token) => sendResponse({ token }));
+      return true;
     case 'copilot.ended':
       // Only the offscreen document sends this; close it to release the capture completely. During a
       // stop requested here, wait: closing now would cut off its reply to offscreen.stop.

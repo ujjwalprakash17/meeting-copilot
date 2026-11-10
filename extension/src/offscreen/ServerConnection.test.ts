@@ -68,7 +68,7 @@ describe('ServerConnection', () => {
     const { conn, lines, calls } = setup();
     conn.connect();
     latest().drop(1006);
-    expect(calls).toEqual([expect.stringMatching(/^closed:Cannot connect to the Meeting Copilot server at .*npm run dev:server/)]);
+    expect(calls).toEqual([expect.stringMatching(/^closed:Cannot connect to the Meeting Copilot server at .*server URL in Settings/)]);
     const line = lines.find((l) => l.includes('connect_failed')) ?? '';
     expect(line).toMatch(/\[ERROR\] \[ws\] connect_failed sid=s-1 host=localhost:8790 code=1006 .*recovery=session_stopped/);
     expect(lines.join('\n')).not.toContain('abc123secret'); // only the host is logged, never the query string

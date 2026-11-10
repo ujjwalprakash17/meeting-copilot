@@ -1,14 +1,16 @@
 import { useCallback, useEffect, useState } from 'react';
-import type { AccountStatus } from '@meeting-copilot/shared';
-import { fetchAccount, signIn, signOut, signUp } from '../../lib/serverApi.js';
+import type { AuthConfigResponse } from '@meeting-copilot/shared';
+import { getAuthConfig, getUser, signIn, signOut, signUp } from '../../lib/auth.js';
 
 /**
- * Sign-in for the shared Supabase history. Shown only when the server uses HISTORY_BACKEND=supabase.
- * The password is sent once to the local server (which forwards it to Supabase Auth) and is never stored.
+ * Meeting Copilot account. Shown when the server uses accounts (hosted servers require one).
+ * Sign-in goes straight from this window to Supabase Auth; the password never reaches the Meeting Copilot server.
  */
 export function AccountCard({ serverUrl }: { serverUrl: string }) {
-  const [status, setStatus] = useState<AccountStatus | null>(null);
-  const [email, setEmail] = useState('');
+  const [cfg, setCfg] = useState<AuthConfigResponse | null>(null);
+  const [email, setEmail] = useState<string | null>(null);
+  const [loaded, setLoaded] = useState(false);
+  const [formEmail, setFormEmail] = useState('');
   const [password, setPassword] = useState('');
   const [mode, setMode] = useState<'sign-in' | 'sign-up'>('sign-in');
   const [busy, setBusy] = useState(false);
@@ -17,11 +19,14 @@ export function AccountCard({ serverUrl }: { serverUrl: string }) {
 
   const refresh = useCallback(async () => {
     try {
-      setStatus(await fetchAccount(serverUrl));
+      const c = await getAuthConfig(serverUrl);
+      setCfg(c);
+      setEmail(c.supabaseUrl ? ((await getUser(serverUrl))?.email ?? null) : null);
       setError(null);
     } catch (err) {
-      setStatus(null);
       setError((err as Error).message);
+    } finally {
+      setLoaded(true);
     }
   }, [serverUrl]);
 
@@ -29,18 +34,14 @@ export function AccountCard({ serverUrl }: { serverUrl: string }) {
     void refresh();
   }, [refresh]);
 
-  const run = async (fn: () => Promise<AccountStatus>) => {
+  const run = async (fn: () => Promise<void>) => {
     setBusy(true);
     setError(null);
     setInfo(null);
     try {
-      const next = await fn();
-      setStatus(next);
+      await fn();
       setPassword('');
-      if (next.needsConfirmation) {
-        setInfo('Account created. Open the confirmation link we emailed you, then sign in here.');
-        setMode('sign-in');
-      }
+      await refresh();
     } catch (err) {
       setError((err as Error).message);
     } finally {
@@ -48,21 +49,22 @@ export function AccountCard({ serverUrl }: { serverUrl: string }) {
     }
   };
 
-  if (status && !status.configured) return null; // SQLite backend: no account needed.
+  if (loaded && cfg && !cfg.supabaseUrl) return null; // Local server without accounts.
 
   return (
     <div className="card stack">
       <div className="row">
         <strong className="grow">Account</strong>
-        {status?.signedIn && <span className="pill ok">signed in</span>}
+        {email ? <span className="pill ok">signed in</span> : cfg?.authRequired ? <span className="pill">required</span> : null}
       </div>
       {error && <div className="banner error">{error}</div>}
       {info && <div className="banner info">{info}</div>}
-      {status?.signedIn ? (
+      {!loaded ? (
+        <p className="hint">Checking account…</p>
+      ) : email ? (
         <>
           <p className="hint">
-            Signed in as <b>{status.email}</b>. Your conversation history is saved to the shared Supabase database; only you can read
-            it.
+            Signed in as <b>{email}</b>. Your conversation history is saved to your account; only you can read it.
           </p>
           <div className="row">
             <button disabled={busy} onClick={() => void run(() => signOut(serverUrl))}>
@@ -70,17 +72,27 @@ export function AccountCard({ serverUrl }: { serverUrl: string }) {
             </button>
           </div>
         </>
-      ) : status ? (
+      ) : cfg ? (
         <form
           className="stack"
           onSubmit={(e) => {
             e.preventDefault();
-            void run(() => (mode === 'sign-in' ? signIn : signUp)(serverUrl, email.trim(), password));
+            const address = formEmail.trim().toLowerCase();
+            void run(async () => {
+              if (mode === 'sign-in') {
+                await signIn(serverUrl, address, password);
+              } else if (await signUp(serverUrl, address, password)) {
+                setInfo('Account created. Open the confirmation link we emailed you, then sign in here.');
+                setMode('sign-in');
+              }
+            });
           }}
         >
-          <p className="hint">Sign in to save your history to the shared database and see it from any computer.</p>
+          <p className="hint">
+            {cfg.authRequired ? 'Sign in to start listening. ' : ''}Your history is saved to your account and available on any computer.
+          </p>
           <label>Email</label>
-          <input type="email" autoComplete="email" required value={email} onChange={(e) => setEmail(e.target.value)} />
+          <input type="email" autoComplete="email" required value={formEmail} onChange={(e) => setFormEmail(e.target.value)} />
           <label>Password</label>
           <input
             type="password"
@@ -100,9 +112,7 @@ export function AccountCard({ serverUrl }: { serverUrl: string }) {
             </button>
           </div>
         </form>
-      ) : (
-        <p className="hint">Checking account…</p>
-      )}
+      ) : null}
     </div>
   );
 }

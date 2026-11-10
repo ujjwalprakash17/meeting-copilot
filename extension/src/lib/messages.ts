@@ -16,7 +16,20 @@ export type RuntimeMessage =
   /** Move the assistant window to a display that does not show the meeting (user action or session start). */
   | { type: 'copilot.placeAssistant' }
   // service worker -> offscreen
-  | { target: 'offscreen'; type: 'offscreen.start'; mode: 'live' | 'simulation'; streamId: string | null; serverUrl: string; config: SessionConfig; tabId: number | null; tabTitle: string | null }
+  | {
+      target: 'offscreen';
+      type: 'offscreen.start';
+      mode: 'live' | 'simulation';
+      streamId: string | null;
+      serverUrl: string;
+      config: SessionConfig;
+      tabId: number | null;
+      tabTitle: string | null;
+      /** Signed-in user's Supabase access token (hosted servers require it). */
+      accessToken: string | null;
+    }
+  /** Offscreen document → service worker: a fresh access token (the offscreen document has no chrome.storage). */
+  | { type: 'copilot.getAccessToken'; serverUrl: string }
   | { target: 'offscreen'; type: 'offscreen.stop'; reason?: string }
   // assistant -> offscreen
   | { target: 'offscreen'; type: 'offscreen.command'; command: UiCommand }

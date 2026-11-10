@@ -4,12 +4,12 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import express, { type NextFunction, type Request, type Response } from 'express';
 import { WebSocketServer, type RawData, type WebSocket } from 'ws';
-import { elapsedMs, LIMITS, monotonicNow, parseClientEvent, type ApiErrorBody, type ServerEvent } from '@meeting-copilot/shared';
+import { elapsedMs, LIMITS, monotonicNow, parseClientEvent, type ApiErrorBody, type ClientEvent, type ServerEvent } from '@meeting-copilot/shared';
 import type { ServerConfig } from './config.js';
 import type { HistoryWriter } from './history/HistoryWriter.js';
 import { historyRouter, type HistoryState } from './history/routes.js';
-import { accountRouter, CONFIRMED_PAGE } from './account/routes.js';
-import type { SupabaseAccount } from './account/SupabaseAccount.js';
+import { AuthRequiredError, bearerToken, type AuthenticatedUser, type UserDirectory } from './auth/UserDirectory.js';
+import { CONFIRMED_PAGE } from './auth/pages.js';
 import { generateInsight, MAX_INSIGHT_TRANSCRIPT_CHARS, type InsightKind } from './insights/insights.js';
 import { latencyTracker, summarize, type LatencyTracker } from './latency/LatencyTracker.js';
 import { LlmError, type LlmProvider } from './llm/types.js';
@@ -33,8 +33,10 @@ export interface AppDeps {
   historyError?: string | null;
   historyDbPath?: string | null;
   historyBackend?: 'sqlite' | 'supabase';
-  /** Signed-in Supabase user (HISTORY_BACKEND=supabase); null for the SQLite backend. */
-  account?: SupabaseAccount | null;
+  /** Multi-user servers (HISTORY_BACKEND=supabase): verifies access tokens and hands out per-user history writers. */
+  users?: UserDirectory | null;
+  /** Public Supabase settings sent to the extension so it can sign users in. */
+  supabase?: { url: string; publishableKey: string } | null;
   tracker?: LatencyTracker;
   /** Conversation memory shared by this server's connections; null disables it. Default: per CONTEXT_MEMORY. */
   memory?: MemoryStore | null;
@@ -61,7 +63,7 @@ export function createApp(deps: AppDeps): { server: http.Server; wss: WebSocketS
       res.setHeader('Access-Control-Allow-Origin', origin);
       res.setHeader('Vary', 'Origin');
       res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PATCH, DELETE, OPTIONS');
-      res.setHeader('Access-Control-Allow-Headers', 'Content-Type, X-File-Name, X-Confirm-Delete-All');
+      res.setHeader('Access-Control-Allow-Headers', 'Authorization, Content-Type, X-File-Name, X-Confirm-Delete-All');
       res.setHeader('Access-Control-Max-Age', '600');
     } else if (isApi && (origin || !config.allowNoOrigin)) {
       return apiError(res, 403, 'forbidden_origin', 'Requests are only accepted from the Meeting Copilot extension.');
@@ -73,17 +75,51 @@ export function createApp(deps: AppDeps): { server: http.Server; wss: WebSocketS
   app.get('/health', (_req, res) => res.json({ ok: true }));
 
   // Provider status (no secrets): lets the extension show what is configured.
+  const users = deps.users ?? null;
+  const authRequired = Boolean(config.authRequired && users);
+
+  /** Verifies the request's bearer token (multi-user servers). */
+  const authenticateRequest = async (req: Request): Promise<{ user: AuthenticatedUser; token: string }> => {
+    if (!users) throw new AuthRequiredError('This server has no accounts.');
+    const token = bearerToken(req.headers.authorization);
+    return { user: await users.authenticate(token), token: token as string };
+  };
+
+  /** Paid endpoints (transcription, LLM) need a signed-in user when the server requires accounts. */
+  const requireUser = async (req: Request, res: Response, next: NextFunction) => {
+    if (!authRequired) return next();
+    try {
+      await authenticateRequest(req);
+      next();
+    } catch (err) {
+      const e = err instanceof AuthRequiredError ? err : new AuthRequiredError();
+      apiError(res, 401, e.code, e.message);
+    }
+  };
+
   const historyState: HistoryState = {
-    writer: deps.history ?? null,
+    writer: users ? null : (deps.history ?? null),
     error: deps.historyError ?? null,
     dbPath: deps.historyDbPath ?? null,
     backend: deps.historyBackend ?? 'sqlite',
+    forRequest: users
+      ? async (req) => {
+          const { user, token } = await authenticateRequest(req);
+          return users.writerFor(user, token);
+        }
+      : undefined,
   };
   app.use('/api/history', historyRouter(historyState));
-  app.use(
-    '/api/account',
-    accountRouter({ account: deps.account ?? null, writer: deps.history ?? null, confirmRedirectUrl: `http://${['0.0.0.0', '::'].includes(config.host) ? '127.0.0.1' : config.host}:${config.port}/auth/confirmed` }),
-  );
+
+  // Public sign-in settings for the extension (no secrets: the publishable key is meant to be public).
+  app.get('/api/auth/config', (_req, res) => {
+    res.json({
+      backend: deps.historyBackend ?? 'sqlite',
+      authRequired,
+      supabaseUrl: deps.supabase?.url ?? null,
+      supabasePublishableKey: deps.supabase?.publishableKey ?? null,
+    });
+  });
   app.get('/auth/confirmed', (_req, res) => res.type('html').send(CONFIRMED_PAGE));
 
   // Latency summary (timestamps only, no content). Real-provider and simulated runs are reported separately.
@@ -103,7 +139,8 @@ export function createApp(deps: AppDeps): { server: http.Server; wss: WebSocketS
 
   app.get('/api/status', (_req, res) => {
     res.json({
-      history: { enabled: Boolean(deps.history), error: deps.historyError ?? null, backend: deps.historyBackend ?? 'sqlite' },
+      history: { enabled: Boolean(deps.history || users), error: deps.historyError ?? null, backend: deps.historyBackend ?? 'sqlite' },
+      authRequired,
       stt: { provider: deps.liveStt.name, configured: deps.liveStt.isConfigured() },
       llm: deps.llm.status(),
       detectionModel: deps.llm.classifyJson && config.llm.groqDetectionModel ? config.llm.groqDetectionModel : null,
@@ -113,6 +150,7 @@ export function createApp(deps: AppDeps): { server: http.Server; wss: WebSocketS
   // Resume upload: raw body + X-File-Name header. The file stays in memory and is discarded after extraction.
   app.post(
     '/api/resume/extract',
+    requireUser,
     express.raw({ type: () => true, limit: LIMITS.maxResumeFileBytes }),
     async (req: Request, res: Response) => {
       const fileName = decodeURIComponent(String(req.headers['x-file-name'] ?? 'resume')).slice(0, 255) || 'resume';
@@ -132,7 +170,7 @@ export function createApp(deps: AppDeps): { server: http.Server; wss: WebSocketS
     },
   );
 
-  app.post('/api/insights', express.json({ limit: '256kb' }), async (req: Request, res: Response) => {
+  app.post('/api/insights', requireUser, express.json({ limit: '256kb' }), async (req: Request, res: Response) => {
     const kind = req.body?.kind as InsightKind;
     const transcript = req.body?.transcript;
     if (kind !== 'summary' && kind !== 'action_items') return apiError(res, 400, 'bad_request', 'kind must be summary or action_items');
@@ -179,8 +217,44 @@ export function createApp(deps: AppDeps): { server: http.Server; wss: WebSocketS
     const send = (event: ServerEvent) => {
       if (ws.readyState === ws.OPEN) ws.send(JSON.stringify(event));
     };
-    const session = new Session({ ...deps, memory }, send, log.child('session', { cid }));
+    // Multi-user servers attach the user's history once their token is verified (see handleText).
+    const session = new Session(users ? { ...deps, memory, history: null } : { ...deps, memory }, send, log.child('session', { cid }));
     let badMessages = 0;
+    let userId: string | null = null;
+    // Text events are handled strictly in order, even when one waits for token verification.
+    let chain: Promise<void> = Promise.resolve();
+
+    const refuse = (message: string) => {
+      connLog.warn('auth_refused', { reason: message });
+      send({ type: 'session.error', code: 'auth_required', message, fatal: true, ts: Date.now() });
+      ws.close(1008, 'Sign in required');
+    };
+
+    const handleText = async (event: ClientEvent) => {
+      if (users && (event.type === 'audio.start' || event.type === 'auth.update')) {
+        const token = event.accessToken;
+        if (token) {
+          try {
+            const user = await users.authenticate(token);
+            if (userId && user.userId !== userId) return refuse('A session cannot switch accounts. Stop and start again.');
+            const writer = users.writerFor(user, token);
+            if (!userId) {
+              userId = user.userId;
+              connLog.info('authenticated');
+              session.attachHistory(writer);
+            }
+          } catch (err) {
+            if (authRequired || event.type === 'auth.update') {
+              return refuse(err instanceof AuthRequiredError ? err.message : 'Could not verify your sign-in.');
+            }
+          }
+        } else if (authRequired && event.type === 'audio.start' && !userId) {
+          return refuse(new AuthRequiredError().message);
+        }
+      }
+      if (event.type === 'auth.update') return;
+      session.handleEvent(event);
+    };
 
     ws.on('message', (data: RawData, isBinary: boolean) => {
       const buf = Array.isArray(data) ? Buffer.concat(data) : Buffer.isBuffer(data) ? data : Buffer.from(data);
@@ -193,7 +267,8 @@ export function createApp(deps: AppDeps): { server: http.Server; wss: WebSocketS
         if (badMessages > MAX_BAD_MESSAGES) ws.close(1008, 'Too many invalid messages');
         return;
       }
-      session.handleEvent(parsed.value);
+      const event = parsed.value;
+      chain = chain.then(() => handleText(event)).catch((err: unknown) => connLog.error('event_failed', { type: event.type, err }));
     });
     ws.on('close', (code, reason) => {
       connLog.info('disconnected', { code, reason: reason.toString() || undefined, duration_ms: elapsedMs(t0) });

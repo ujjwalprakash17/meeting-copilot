@@ -38,7 +38,8 @@ export interface ExtensionSettings {
 }
 
 export const DEFAULT_SETTINGS: ExtensionSettings = {
-  serverUrl: 'http://localhost:8787',
+  // Set at build time (VITE_DEFAULT_SERVER_URL) to the hosted server; local development falls back to localhost.
+  serverUrl: import.meta.env.VITE_DEFAULT_SERVER_URL || 'http://localhost:8787',
   answerMode: DEFAULT_SESSION_CONFIG.answerMode,
   answerStyle: DEFAULT_SESSION_CONFIG.answerStyle,
   answerLength: DEFAULT_SESSION_CONFIG.answerLength,

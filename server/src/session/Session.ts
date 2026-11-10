@@ -113,8 +113,8 @@ export class Session {
   private readonly tentativeRequirements = new Map<string, string>();
   private specCountThisUtterance = 0;
   private candidateThisFlush = false;
-  private readonly recorder: ConversationRecorder | null;
-  private readonly unsubscribeHistoryErrors: (() => void) | null;
+  private recorder: ConversationRecorder | null = null;
+  private unsubscribeHistoryErrors: (() => void) | null = null;
   private lastHistoryNoticeAt = 0;
   private readonly tracker: LatencyTracker;
   private readonly send: (event: ServerEvent) => void;
@@ -130,25 +130,12 @@ export class Session {
   ) {
     this.log = logger;
     this.tracker = deps.tracker ?? latencyTracker;
-    const history = deps.history ?? null;
-    this.recorder = history ? new ConversationRecorder(history, undefined, () => this.mode === 'simulation' || deps.llm.simulated) : null;
     // Events go to the client first; history only observes them afterwards (in-memory enqueue).
     this.send = (event) => {
       sendToClient(event);
       this.recorder?.observe(event);
     };
-    this.unsubscribeHistoryErrors = history
-      ? history.onError((err, info) => {
-          if (Date.now() - this.lastHistoryNoticeAt < HISTORY_ERROR_NOTICE_INTERVAL_MS) return;
-          this.lastHistoryNoticeAt = Date.now();
-          this.error(
-            'history_write_failed',
-            info.willRetry
-              ? 'Saving conversation history failed; retrying. Live answers are unaffected.'
-              : `Conversation history could not be saved (${err.message}). Live answers are unaffected.`,
-          );
-        })
-      : null;
+    if (deps.history) this.attachHistory(deps.history);
 
     this.detector = new QuestionDetector(
       {
@@ -179,6 +166,25 @@ export class Session {
     return this.deps.config.latency ?? DEFAULT_LATENCY;
   }
 
+  /**
+   * Starts recording this session's cards with `history` (hosted servers call this once the user's access
+   * token is verified, which may be after the session started).
+   */
+  attachHistory(history: HistoryWriter): void {
+    if (this.closed || this.recorder) return;
+    this.recorder = new ConversationRecorder(history, this.sessionConfig?.conversationId, () => this.mode === 'simulation' || this.deps.llm.simulated);
+    this.unsubscribeHistoryErrors = history.onError((err, info) => {
+      if (Date.now() - this.lastHistoryNoticeAt < HISTORY_ERROR_NOTICE_INTERVAL_MS) return;
+      this.lastHistoryNoticeAt = Date.now();
+      this.error(
+        'history_write_failed',
+        info.willRetry
+          ? 'Saving conversation history failed; retrying. Live answers are unaffected.'
+          : `Conversation history could not be saved (${err.message}). Live answers are unaffected.`,
+      );
+    });
+  }
+
   private error(code: Extract<ServerEvent, { type: 'session.error' }>['code'], message: string, fatal = false): void {
     this.send({ type: 'session.error', code, message, fatal, ts: Date.now() });
   }
@@ -186,6 +192,8 @@ export class Session {
   handleEvent(event: ClientEvent): void {
     if (this.closed) return;
     switch (event.type) {
+      case 'auth.update':
+        return; // handled by the connection (app.ts)
       case 'audio.start':
         return this.start(event.sessionId, event.mode, event.config, event.continuation);
       case 'audio.stop':

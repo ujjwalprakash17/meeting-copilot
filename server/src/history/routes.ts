@@ -10,7 +10,7 @@ import express, { type Request, type Response, type Router } from 'express';
 import { z } from 'zod';
 import { UUID_RE, type ApiErrorBody } from '@meeting-copilot/shared';
 import { log } from '../logger.js';
-import { AuthRequiredError } from '../account/SupabaseAccount.js';
+import { AuthRequiredError } from '../auth/UserDirectory.js';
 
 const apiLog = log.child('history-api');
 import type { HistoryWriter } from './HistoryWriter.js';
@@ -31,13 +31,15 @@ export interface HistoryState {
   dbPath: string | null;
   /** Storage backend, shown in the extension. */
   backend?: 'sqlite' | 'supabase';
+  /** Multi-user servers: resolves the signed-in user's writer from the request (throws AuthRequiredError). */
+  forRequest?: (req: Request) => Promise<HistoryWriter>;
 }
 
 export function historyRouter(state: HistoryState): Router {
   const router = express.Router();
 
   router.use((_req, res, next) => {
-    if (!state.writer) return apiError(res, 503, 'history_unavailable', state.error ?? 'Conversation history is disabled on the server.');
+    if (!state.writer && !state.forRequest) return apiError(res, 503, 'history_unavailable', state.error ?? 'Conversation history is disabled on the server.');
     next();
   });
 
@@ -53,7 +55,8 @@ export function historyRouter(state: HistoryState): Router {
   const run = (fn: (req: Request, res: Response, writer: HistoryWriter) => Promise<unknown>) => async (req: Request, res: Response) => {
     try {
       // Reads include anything still queued, so the list reflects the latest answers.
-      await fn(req, res, state.writer as HistoryWriter);
+      const writer = state.forRequest ? await state.forRequest(req) : (state.writer as HistoryWriter);
+      await fn(req, res, writer);
     } catch (err) {
       if (err instanceof AuthRequiredError) return apiError(res, 401, err.code, err.message);
       apiLog.error('request_failed', { method: req.method, route: req.route?.path ?? req.path.replace(/[0-9a-f-]{36}/gi, ':id'), err });

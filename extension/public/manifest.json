@@ -2,6 +2,7 @@
   "manifest_version": 3,
   "name": "Meeting Copilot",
   "version": "0.1.0",
+  "key": "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAxDFDVfgPtBPCg3NoY8NhYAnBNWX1ZtY1wICqC2XAkPGz+Wk1BHEnQXZ1zpt1lE9HExoN2YXlXOw5zC/++vmxtzKUBStD6WEBUnk9e9lwBcVm7qNY0Bq8emcuB10+MRKNjxB4XiQd0BeeyUbLbxVb/wRAZ2aYGm1W8MB/8tp/Yb7hmVH1H/H+huOSUFOfiXgEpUqhwTwj77OcHmmNVdYFYOfTx34KGulgxAx2tKCvKitpTV3rGVv+/yXde3Eai+8dXDBtbEHSekPyCiTXamqDten99b/3wesTX7Mos3u3Eax/oQF3jqHb5dSXMrUBU7eePskBo2sH+8TIALiMPFrE3QIDAQAB",
   "description": "Real-time transcription and AI-suggested answers for Google Meet and Microsoft Teams (web). User-started, visible capture only.",
   "minimum_chrome_version": "116",
   "permissions": [

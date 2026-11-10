@@ -11,5 +11,3 @@ server/data/
 *.sqlite-shm
 server/bench/samples/
 
-# Supabase signed-in session (refresh token); never commit
-supabase-session.json

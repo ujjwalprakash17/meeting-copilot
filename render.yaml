@@ -1,0 +1,45 @@
+# Render Blueprint: the hosted Meeting Copilot server (Express + WebSocket).
+# Deploy: Render dashboard → New → Blueprint → pick this repository. Pushes to the linked branch redeploy.
+# Secrets (DEEPGRAM_API_KEY, GROQ_API_KEY) are entered in the Render dashboard, never committed.
+services:
+  - type: web
+    name: meeting-copilot-server
+    runtime: node
+    region: singapore          # closest Render region to the Supabase project (Mumbai)
+    plan: free                 # switch to "starter" for an always-on server (no 1-minute wake-up)
+    buildCommand: npm ci --include=dev && npm run build -w server
+    startCommand: npm run start -w server
+    healthCheckPath: /health
+    autoDeploy: true
+    buildFilter:
+      paths:
+        - server/**
+        - shared/**
+        - supabase/**
+        - package.json
+        - package-lock.json
+        - render.yaml
+    envVars:
+      - key: NODE_VERSION
+        value: "22"
+      - key: HOST
+        value: 0.0.0.0
+      - key: LOG_LEVEL
+        value: info
+      # Shared history + accounts (Supabase). Both values are public by design; RLS protects the data.
+      - key: HISTORY_BACKEND
+        value: supabase
+      - key: SUPABASE_URL
+        value: https://jmxfwxsfumneqjxltuma.supabase.co
+      - key: SUPABASE_PUBLISHABLE_KEY
+        value: sb_publishable_iCyI3kEogrjD76rQxTFAcw_gbKlmfA3
+      - key: AUTH_REQUIRED
+        value: "true"
+      # Only the Meeting Copilot extension (fixed ID from the "key" in extension/public/manifest.json) may call the server.
+      - key: ALLOWED_EXTENSION_IDS
+        value: dlfbnoebakjbphpgkakhjjhjaicbameh
+      # Provider keys: set these in the Render dashboard (Environment). Shared by all users.
+      - key: DEEPGRAM_API_KEY
+        sync: false
+      - key: GROQ_API_KEY
+        sync: false

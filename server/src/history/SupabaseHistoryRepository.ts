@@ -2,11 +2,11 @@
  * Supabase (hosted Postgres) implementation of the history repository.
  *
  * Schema, RLS policies and the batch function live in supabase/migrations. Every call runs as the signed-in
- * user (publishable key + user JWT), so Row Level Security restricts reads and writes to that user's rows;
+ * user (publishable key + that user's access token), so Row Level Security restricts reads and writes to that user's rows;
  * the explicit user_id filters below only help the planner use the (user_id, …) indexes.
  */
-import type { PostgrestError } from '@supabase/supabase-js';
-import { AuthRequiredError, type SupabaseAccount } from '../account/SupabaseAccount.js';
+import type { PostgrestError, SupabaseClient } from '@supabase/supabase-js';
+import { AuthRequiredError } from '../auth/UserDirectory.js';
 import type { CardRecord, ConversationSummary, HistoryOp, HistoryRepository } from './types.js';
 
 type Row = Record<string, unknown>;
@@ -69,8 +69,15 @@ function dbError(error: PostgrestError): Error {
   return new Error(`Supabase: ${error.message}${error.code ? ` (${error.code})` : ''}`);
 }
 
+/** A Supabase client that acts as one user, plus a guard that returns that user's ID (or throws AuthRequiredError). */
+export interface UserDatabase {
+  client: SupabaseClient;
+  requireUserId(): Promise<string>;
+  close?(): void;
+}
+
 export class SupabaseHistoryRepository implements HistoryRepository {
-  constructor(readonly account: SupabaseAccount) {}
+  constructor(readonly account: UserDatabase) {}
 
   private get db() {
     return this.account.client;
@@ -133,6 +140,6 @@ export class SupabaseHistoryRepository implements HistoryRepository {
   }
 
   close(): void {
-    this.account.close();
+    this.account.close?.();
   }
 }
