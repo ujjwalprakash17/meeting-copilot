@@ -55,7 +55,7 @@ afterEach(async () => {
 });
 
 async function app(scripts: string[][], llm: RecordingLlm, opts: { memoryOff?: boolean } = {}) {
-  const a = await startApp({ script: [], llm, liveStt: new QueueStt(scripts), ...(opts.memoryOff ? { config: { contextMemory: false } } : {}) });
+  const a = await startApp({ script: [], llm, liveStt: new QueueStt(scripts), config: { contextMemory: !opts.memoryOff } });
   cleanup.push(() => a.close());
   return a;
 }
@@ -284,7 +284,7 @@ describe('failures fall back to the existing answer path', () => {
 
   it('records quickly consecutive questions in order', async () => {
     const llm = new RecordingLlm();
-    const a = await startApp({ script: [], llm, liveStt: new QueueStt([['Design a URL shortener.', 'How would you scale it?', 'What about caching?', 'What about security?']], 20) });
+    const a = await startApp({ script: [], llm, liveStt: new QueueStt([['Design a URL shortener.', 'How would you scale it?', 'What about caching?', 'What about security?']], 20), config: { contextMemory: true } });
     cleanup.push(() => a.close());
     const s = await session(a.baseUrl, 'sess-fast');
     await s.waitFor((e) => ofType(e, 'question.detected').length === 4);

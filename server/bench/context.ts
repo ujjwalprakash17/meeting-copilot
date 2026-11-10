@@ -17,11 +17,10 @@ import { readFileSync } from 'node:fs';
 import path from 'node:path';
 import { performance } from 'node:perf_hooks';
 import { fileURLToPath } from 'node:url';
-import { ConversationMemory, namesOwnSubject, type QuestionInfo } from '../src/context/ConversationMemory.js';
-import { DESIGN_EXTENSION, SCOPE_INSTRUCTION, designRequestTitle } from '../src/context/extract.js';
+import { ConversationMemory, namesOwnSubject, utteranceSentences, type QuestionInfo } from '../src/context/ConversationMemory.js';
+import { DESIGN_INSTRUCTION, designRequestTitle } from '../src/context/extract.js';
 import { classifyQuestionIntent } from '../src/detection/intent.js';
 import { QuestionDetector } from '../src/detection/QuestionDetector.js';
-import { QUESTION_THRESHOLD, scoreSentence, splitSentences } from '../src/detection/scoring.js';
 
 interface Turn {
   text: string;
@@ -69,7 +68,7 @@ for (const conv of conversations) {
   let n = 0;
   for (const turn of conv.turns) {
     const t0 = performance.now();
-    memory.observeStatements(splitSentences(turn.text).filter((s) => scoreSentence(s).score < QUESTION_THRESHOLD || SCOPE_INSTRUCTION.test(s)));
+    memory.observeUtterance(utteranceSentences(turn.text));
     if (turn.kind !== 'question') {
       times.push(performance.now() - t0);
       continue;
@@ -77,7 +76,7 @@ for (const conv of conversations) {
     questions++;
     const c = detector.evaluate(turn.text, []);
     // Same promotion as Session.observeForContext: a design task set as a statement, or an extension of the active design.
-    const extension = !c && (designRequestTitle(turn.text) !== null || (memory.activeTopic?.kind === 'system_design' && DESIGN_EXTENSION.test(turn.text.trim())));
+    const extension = !c && (designRequestTitle(turn.text) !== null || (memory.activeTopic?.kind === 'system_design' && DESIGN_INSTRUCTION.test(turn.text.trim())));
     if (!c && !extension) {
       m.undetected++;
       failures.push(`[${conv.name}] not detected as a question: ${turn.text}`);

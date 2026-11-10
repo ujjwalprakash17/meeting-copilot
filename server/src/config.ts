@@ -46,7 +46,7 @@ export interface ServerConfig {
   simulationSpeed: number;
   latency?: LatencyConfig;
   history?: HistoryConfig;
-  /** Session-scoped conversation memory for context-aware answers (CONTEXT_MEMORY, default on). */
+  /** Session-scoped conversation memory for context-aware answers (CONTEXT_MEMORY, default off). */
   contextMemory?: boolean;
 }
 
@@ -140,7 +140,7 @@ export function loadConfig(): ServerConfig {
       classifierTimeoutMs: num('CLASSIFIER_TIMEOUT_MS', DEFAULT_LATENCY.classifierTimeoutMs),
       continuationWindowMs: num('CONTINUATION_WINDOW_MS', DEFAULT_LATENCY.continuationWindowMs),
     },
-    contextMemory: bool('CONTEXT_MEMORY', true),
+    contextMemory: bool('CONTEXT_MEMORY', false),
     history: {
       enabled: bool('HISTORY_ENABLED', true),
       dbPath: path.resolve(str('HISTORY_DB_PATH') ?? path.resolve(here, '../data/history.sqlite')),

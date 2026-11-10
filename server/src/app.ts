@@ -43,8 +43,8 @@ const apiError = (res: Response, status: number, code: string, message: string) 
 
 export function createApp(deps: AppDeps): { server: http.Server; wss: WebSocketServer } {
   const { config } = deps;
-  // One store per server: an extension reconnect opens a new connection but resumes the same memory.
-  const memory = deps.memory !== undefined ? deps.memory : config.contextMemory === false ? null : new MemoryStore();
+  // Off unless turned on. One store per server: an extension reconnect opens a new connection but resumes the same memory.
+  const memory = deps.memory !== undefined ? deps.memory : config.contextMemory === true ? new MemoryStore() : null;
   const app = express();
   app.disable('x-powered-by');
 
